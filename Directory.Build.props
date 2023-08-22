@@ -5,18 +5,18 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>9</LangVersion>		
 		
-		<AssemblyName>Byndyusoft.$(MSBuildProjectName)</AssemblyName>
-		<RootNamespace>Byndyusoft.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>Byndyusoft.AspNetCore.Mvc.$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>Byndyusoft.AspNetCore.Mvc.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		
 		<VersionPrefix>0.0.1</VersionPrefix>
 		<Authors>Byndyusoft</Authors>
 		
-		<PackageTags>Byndyusoft;NugetPackageExample</PackageTags>
+		<PackageTags>Byndyusoft</PackageTags>
 		
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		
-		<RepositoryUrl>https://github.com/Byndyusoft/NetGithubActionsNugetTemplate</RepositoryUrl>
+		<RepositoryUrl>https://github.com/Byndyusoft/Byndyusoft.AspNetCore.Mvc.Telemetry</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		
 		<PackageIcon>icon.png</PackageIcon>

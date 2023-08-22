@@ -1,27 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Byndyusoft.MaskedSerialization.Newtonsoft.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
+// TODO Remove Tracing
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 {
     public class AspNetMvcRequestTracingFilter : IAsyncActionFilter
     {
+        private readonly ITelemetryRouter _telemetryRouter;
         private readonly AspNetMvcTracingOptions _options;
 
-        public AspNetMvcRequestTracingFilter(IOptions<AspNetMvcTracingOptions> options)
+        public AspNetMvcRequestTracingFilter(
+            IOptions<AspNetMvcTracingOptions> options,
+            ITelemetryRouter telemetryRouter)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
+            _telemetryRouter = telemetryRouter;
 
             _options = options.Value;
         }
@@ -38,7 +44,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
             ActionExecutionDelegate next,
             CancellationToken cancellationToken)
         {
-            var tags = new TelemetryInfoItemCollection
+            var telemetryInfoItemCollection = new TelemetryInfoItemCollection(TelemetryProviderUniqueNames.HttpRequest)
             {
                 { "http.request.header.accept", context.HttpContext.Request.Headers["accept"].ToArray() },
                 { "http.request.header.content_type", context.HttpContext.Request.ContentType },
@@ -51,11 +57,10 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 
                 var json = await _options.FormatAsync(value, cancellationToken)
                     .ConfigureAwait(false);
-                tags.Add($"http.request.params.{name}", json);
+                telemetryInfoItemCollection.Add($"http.request.params.{name}", json);
             }
 
-            //var @event = new ActivityEvent("Action executing", tags: tags);
-            //activity.AddEvent(@event);
+            _telemetryRouter.WriteTelemetryInfo(telemetryInfoItemCollection);
 
             await next();
         }
@@ -253,6 +258,117 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
         {
             var str = Encoding.UTF8.GetString(Inner.ToArray());
             return _oversized ? $"{str}..." : str;
+        }
+    }
+
+    public static class TelemetryProviderUniqueNames
+    {
+        public static string HttpRequest => "HttpRequest";
+    }
+
+    /// <summary>
+    ///     Extension methods for adding Tracing to MVC.
+    /// </summary>
+    public static class TracingMvcBuilderExtensions
+    {
+        /// <returns>The <see cref="IMvcBuilder" />.</returns>
+        public static IMvcBuilder AddTracing(this IMvcBuilder builder,
+            Action<AspNetMvcTracingOptions>? configure = null)
+        {
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder
+                .AddRequestTracing(configure);
+                //.AddResponseTracing(configure);
+        }
+
+        /// <returns>The <see cref="IMvcCoreBuilder" />.</returns>
+        public static IMvcCoreBuilder AddTracing(this IMvcCoreBuilder builder,
+            Action<AspNetMvcTracingOptions>? configure = null)
+        {
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder
+                .AddRequestTracing(configure);
+                //.AddResponseTracing(configure);
+        }
+
+        /// <returns>The <see cref="IMvcBuilder" />.</returns>
+        public static IMvcBuilder AddRequestTracing(this IMvcBuilder builder,
+            Action<AspNetMvcTracingOptions>? configure = null)
+        {
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.AddRequestTracingCore(configure);
+
+            return builder;
+        }
+
+        /// <returns>The <see cref="IMvcCoreBuilder" />.</returns>
+        public static IMvcCoreBuilder AddRequestTracing(this IMvcCoreBuilder builder,
+            Action<AspNetMvcTracingOptions>? configure = null)
+        {
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.AddRequestTracingCore(configure);
+
+            return builder;
+        }
+
+        ///// <returns>The <see cref="IMvcBuilder" />.</returns>
+        //public static IMvcBuilder AddResponseTracing(this IMvcBuilder builder,
+        //    Action<AspNetMvcTracingOptions>? configure = null)
+        //{
+        //    if (builder is null)
+        //        throw new ArgumentNullException(nameof(builder));
+
+        //    builder.Services.AddResponseTracingCore(configure);
+
+        //    return builder;
+        //}
+
+        ///// <returns>The <see cref="IMvcCoreBuilder" />.</returns>
+        //public static IMvcCoreBuilder AddResponseTracing(this IMvcCoreBuilder builder,
+        //    Action<AspNetMvcTracingOptions>? configure = null)
+        //{
+        //    if (builder is null)
+        //        throw new ArgumentNullException(nameof(builder));
+
+        //    builder.Services.AddResponseTracingCore(configure);
+
+        //    return builder;
+        //}
+
+        //private static void AddResponseTracingCore(this IServiceCollection services,
+        //    Action<AspNetMvcTracingOptions>? configure)
+        //{
+        //    if (configure != null)
+        //    {
+        //        services.Configure(configure);
+        //    }
+
+        //    services.PostConfigure<MvcOptions>(options =>
+        //    {
+        //        options.Filters.Add<AspNetMvcResponseTracingFilter>();
+        //    });
+        //}
+
+        private static void AddRequestTracingCore(this IServiceCollection services,
+            Action<AspNetMvcTracingOptions>? configure)
+        {
+            if (configure != null)
+            {
+                services.Configure(configure);
+            }
+
+            services.PostConfigure<MvcOptions>(options =>
+            {
+                options.Filters.Add<AspNetMvcRequestTracingFilter>();
+            });
         }
     }
 }

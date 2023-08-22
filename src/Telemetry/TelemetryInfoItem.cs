@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 {
@@ -22,11 +24,23 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
     public class TelemetryInfoItemCollection : IEnumerable<TelemetryInfoItem>
     {
-        private readonly List<TelemetryInfoItem> _telemetryInfoItems;
+        private readonly List<TelemetryInfoItem> _telemetryInfoItems = new();
 
-        public TelemetryInfoItemCollection(params TelemetryInfoItem[] telemetryInfoItems)
+        public TelemetryInfoItemCollection(string providerUniqueName)
         {
-            _telemetryInfoItems = telemetryInfoItems.ToList();
+            ProviderUniqueName = providerUniqueName;
+        }
+
+        public string ProviderUniqueName { get; }
+
+        public IEnumerator<TelemetryInfoItem> GetEnumerator()
+        {
+            return _telemetryInfoItems.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         public void Add(TelemetryInfoItem telemetryInfoItem)
@@ -39,16 +53,6 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             var telemetryInfoItem = new TelemetryInfoItem(key, value);
             Add(telemetryInfoItem);
         }
-
-        public IEnumerator<TelemetryInfoItem> GetEnumerator()
-        {
-            return _telemetryInfoItems.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 
     public static class TelemetryWriterNames
@@ -58,6 +62,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
     public interface ITelemetryWriter
     {
+        string WriterUniqueName { get; }
+
         void Write(TelemetryInfoItemCollection telemetryInfoItemCollection);
     }
 
@@ -70,10 +76,12 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             _logger = logger;
         }
 
+        public string WriterUniqueName => TelemetryWriterUniqueNames.Log;
+
         public void Write(TelemetryInfoItemCollection telemetryInfoItemCollection)
         {
             var messageBuilder = new StringBuilder("Telemetry Message: ");
-            var arguments = new List<object>();
+            var arguments = new List<object?>();
 
             foreach (var telemetryInfoItem in telemetryInfoItemCollection)
             {
@@ -82,6 +90,86 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             }
 
             _logger.LogInformation(messageBuilder.ToString(), arguments.ToArray());
+        }
+    }
+
+    public static class TelemetryWriterUniqueNames
+    {
+        public static string Log => "Log";
+    }
+
+    public interface ITelemetryRouter
+    {
+        void WriteTelemetryInfo(TelemetryInfoItemCollection telemetryInfoItemCollection);
+    }
+
+    public class TelemetryRouterOptions
+    {
+        internal readonly ICollection<Type> TelemetryWriterTypes = new List<Type>();
+        internal readonly IDictionary<string, HashSet<string>> WriterUniqueNamesByProviderUniqueName = new Dictionary<string, HashSet<string>>();
+
+        public void AddWriter<T>() where T : ITelemetryWriter
+        {
+            TelemetryWriterTypes.Add(typeof(T));
+        }
+
+        public void AddRouting(string providerUniqueName, params string[] writerUniqueNames)
+        {
+            if (string.IsNullOrEmpty(providerUniqueName))
+                throw new ArgumentNullException(nameof(providerUniqueName));
+
+            if (WriterUniqueNamesByProviderUniqueName.TryGetValue(providerUniqueName, out var existingWriterNames) is
+                false)
+            {
+                existingWriterNames = new HashSet<string>();
+                WriterUniqueNamesByProviderUniqueName.Add(providerUniqueName, existingWriterNames);
+            }
+
+            foreach (var writerUniqueName in writerUniqueNames)
+                existingWriterNames.Add(writerUniqueName);
+        }
+    }
+
+    public class TelemetryRouter : ITelemetryRouter
+    {
+        private readonly ILogger<TelemetryRouter> _logger;
+        private readonly Dictionary<string, ITelemetryWriter> _telemetryWritersByUniqueName = new();
+        private readonly IDictionary<string, HashSet<string>> _writerUniqueNamesByProviderUniqueName;
+
+        public TelemetryRouter(
+            ILogger<TelemetryRouter> logger,
+            IOptions<TelemetryRouterOptions> options,
+            IServiceProvider serviceProvider)
+        {
+            _logger = logger;
+
+            var telemetryRouterOptions = options.Value;
+            _writerUniqueNamesByProviderUniqueName = telemetryRouterOptions.WriterUniqueNamesByProviderUniqueName;
+
+            foreach (var telemetryWriterType in telemetryRouterOptions.TelemetryWriterTypes)
+            {
+                var telemetryWriter = (ITelemetryWriter)serviceProvider.GetRequiredService(telemetryWriterType);
+                _telemetryWritersByUniqueName.Add(telemetryWriter.WriterUniqueName, telemetryWriter);
+            }
+        }
+
+        public void WriteTelemetryInfo(TelemetryInfoItemCollection telemetryInfoItemCollection)
+        {
+            var providerUniqueName = telemetryInfoItemCollection.ProviderUniqueName;
+            if (_writerUniqueNamesByProviderUniqueName.TryGetValue(providerUniqueName, out var writerUniqueNames) is
+                false)
+            {
+                _logger.LogWarning($"Не найдены писатели для данных от поставщика {providerUniqueName}");
+                return;
+            }
+
+            foreach (var writerUniqueName in writerUniqueNames)
+            {
+                if (_telemetryWritersByUniqueName.TryGetValue(writerUniqueName, out var telemetryWriter) is false)
+                    continue;
+
+                telemetryWriter.Write(telemetryInfoItemCollection);
+            }
         }
     }
 }

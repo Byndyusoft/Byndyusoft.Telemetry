@@ -26,12 +26,15 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         private readonly List<TelemetryInfoItem> _telemetryInfoItems = new();
 
-        public TelemetryInfoItemCollection(string providerUniqueName)
+        public TelemetryInfoItemCollection(string providerUniqueName, string message)
         {
-            ProviderUniqueName = providerUniqueName;
+            ProviderUniqueName = providerUniqueName ?? throw new ArgumentNullException(nameof(providerUniqueName));
+            Message = message ?? throw new ArgumentNullException(nameof(message));
         }
 
         public string ProviderUniqueName { get; }
+
+        public string Message { get; }
 
         public IEnumerator<TelemetryInfoItem> GetEnumerator()
         {
@@ -80,7 +83,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
         public void Write(TelemetryInfoItemCollection telemetryInfoItemCollection)
         {
-            var messageBuilder = new StringBuilder("Telemetry Message: ");
+            var messageBuilder = new StringBuilder($"{telemetryInfoItemCollection.Message}: ");
             var arguments = new List<object?>();
 
             foreach (var telemetryInfoItem in telemetryInfoItemCollection)

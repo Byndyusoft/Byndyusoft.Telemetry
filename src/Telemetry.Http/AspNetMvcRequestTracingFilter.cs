@@ -44,7 +44,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
             ActionExecutionDelegate next,
             CancellationToken cancellationToken)
         {
-            var telemetryInfoItemCollection = new TelemetryInfoItemCollection(TelemetryProviderUniqueNames.HttpRequest)
+            var telemetryInfoItemCollection = new TelemetryInfoItemCollection(
+                TelemetryHttpProviderUniqueNames.Request,
+                "Action Executing")
             {
                 { "http.request.header.accept", context.HttpContext.Request.Headers["accept"].ToArray() },
                 { "http.request.header.content_type", context.HttpContext.Request.ContentType },
@@ -261,9 +263,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
         }
     }
 
-    public static class TelemetryProviderUniqueNames
+    public static class TelemetryHttpProviderUniqueNames
     {
-        public static string HttpRequest => "HttpRequest";
+        public static string Request => "HttpRequest";
     }
 
     /// <summary>

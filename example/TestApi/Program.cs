@@ -1,3 +1,4 @@
+using System;
 using Byndyusoft.AspNetCore.Mvc.Telemetry;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Http;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
@@ -9,13 +10,18 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Formatting.Json;
+
+Environment.SetEnvironmentVariable("BUILD_COMMIT_HASH", "asdfdasf");
+Environment.SetEnvironmentVariable("BUILD_VERSION", "1.3.4");
 
 var builder = WebApplication
     .CreateBuilder(args);
 
-builder.Host.UseSerilog((context, loggerConfiguration) =>
+builder.Host.UseSerilog((_, loggerConfiguration) =>
 {
-    loggerConfiguration.Enrich.With<TelemetryLogEventEnricher>()
+    loggerConfiguration.Enrich.With<TelemetryLogEventEnricher>();
+    loggerConfiguration.WriteTo.Console(new JsonFormatter());
 });
 
 // Add services to the container.
@@ -53,7 +59,8 @@ builder.Services.Configure<TelemetryRouterOptions>(o =>
         TelemetryActivityWriterUniqueNames.Event);
     o.AddRouting(
         TelemetryProviderUniqueNames.BuildConfiguration,
-        SerilogTelemetryWriterUniqueNames.Property);
+        SerilogTelemetryWriterUniqueNames.Property,
+        TelemetryActivityWriterUniqueNames.Tag);
     o.AddWriter<LogWriter>();
     o.AddWriter<ActivityTagWriter>();
     o.AddWriter<ActivityEventWriter>();
@@ -62,8 +69,7 @@ builder.Services.Configure<TelemetryRouterOptions>(o =>
 builder.Services.AddSingleton<LogWriter>();
 builder.Services.AddSingleton<ActivityTagWriter>();
 builder.Services.AddSingleton<ActivityEventWriter>();
-builder.Services.AddSingleton<ITelemetryRouter, TelemetryRouter>();
-builder.Services.AddHostedService<InitializeStaticTelemetryDataHostedService>();
+builder.Services.AddHostedService<InitializeTelemetryRouterHostedService>();
 
 var app = builder.Build();
 

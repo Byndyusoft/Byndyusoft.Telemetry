@@ -18,16 +18,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 {
     public class AspNetMvcRequestTracingFilter : IAsyncActionFilter
     {
-        private readonly ITelemetryRouter _telemetryRouter;
         private readonly AspNetMvcTracingOptions _options;
 
         public AspNetMvcRequestTracingFilter(
-            IOptions<AspNetMvcTracingOptions> options,
-            ITelemetryRouter telemetryRouter)
+            IOptions<AspNetMvcTracingOptions> options)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
-            _telemetryRouter = telemetryRouter;
 
             _options = options.Value;
         }
@@ -62,7 +59,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
                 telemetryInfoItemCollection.Add($"http.request.params.{name}", json);
             }
 
-            _telemetryRouter.WriteTelemetryInfo(telemetryInfoItemCollection);
+            TelemetryRouter.WriteTelemetryInfo(telemetryInfoItemCollection);
 
             await next();
         }

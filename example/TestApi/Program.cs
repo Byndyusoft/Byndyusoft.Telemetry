@@ -54,13 +54,18 @@ builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 // TODO Вынести в отдельный класс
 builder.Services.Configure<TelemetryRouterOptions>(o =>
 {
-    o.AddRouting(
-        TelemetryHttpProviderUniqueNames.Request, 
-        TelemetryActivityWriterUniqueNames.Event);
-    o.AddRouting(
-        TelemetryProviderUniqueNames.BuildConfiguration,
-        SerilogTelemetryWriterUniqueNames.Property,
-        TelemetryActivityWriterUniqueNames.Tag);
+    o.AddEvent(TelemetryHttpEventNames.Request, eventOptions => eventOptions
+        .WriteEventData(
+            TelemetryHttpProviderUniqueNames.Request, 
+            TelemetryActivityWriterUniqueNames.Event,
+            TelemetryActivityWriterUniqueNames.Tag)
+        .WriteStaticData(
+            StaticTelemetryProviderUniqueNames.BuildConfiguration,
+            TelemetryActivityWriterUniqueNames.Tag));
+    o.AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
+        .WriteStaticData(
+            StaticTelemetryProviderUniqueNames.BuildConfiguration, 
+            SerilogTelemetryWriterUniqueNames.Property));
     o.AddWriter<LogWriter>();
     o.AddWriter<ActivityTagWriter>();
     o.AddWriter<ActivityEventWriter>();

@@ -41,7 +41,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
             ActionExecutionDelegate next,
             CancellationToken cancellationToken)
         {
-            var telemetryInfoItemCollection = new TelemetryInfoItemCollection(
+            var telemetryInfos = new TelemetryInfo(
                 TelemetryHttpProviderUniqueNames.Request,
                 "Action Executing")
             {
@@ -56,10 +56,11 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 
                 var json = await _options.FormatAsync(value, cancellationToken)
                     .ConfigureAwait(false);
-                telemetryInfoItemCollection.Add($"http.request.params.{name}", json);
+                telemetryInfos.Add($"http.request.params.{name}", json);
             }
 
-            TelemetryRouter.WriteTelemetryInfo(telemetryInfoItemCollection);
+            var telemetryEvent = new TelemetryEvent(TelemetryHttpEventNames.Request, telemetryInfos);
+            TelemetryRouter.ProcessTelemetryEvent(telemetryEvent);
 
             await next();
         }
@@ -262,7 +263,12 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 
     public static class TelemetryHttpProviderUniqueNames
     {
-        public static string Request => "HttpRequest";
+        public static string Request => "Http.Request.Default";
+    }
+
+    public static class TelemetryHttpEventNames
+    {
+        public static string Request => "Http.Request";
     }
 
     /// <summary>

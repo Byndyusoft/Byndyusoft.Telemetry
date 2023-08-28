@@ -26,16 +26,17 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         public object? Value { get; }
     }
 
-    public class TelemetryInfoItemCollection : IEnumerable<TelemetryInfoItem>
+    public class TelemetryInfo : IEnumerable<TelemetryInfoItem>
     {
         private readonly List<TelemetryInfoItem> _telemetryInfoItems = new();
 
-        public TelemetryInfoItemCollection(string providerUniqueName, string message)
+        public TelemetryInfo(string providerUniqueName, string message)
         {
             ProviderUniqueName = providerUniqueName ?? throw new ArgumentNullException(nameof(providerUniqueName));
             Message = message ?? throw new ArgumentNullException(nameof(message));
         }
 
+        // TODO: Rename to TelemetryName
         public string ProviderUniqueName { get; }
 
         public string Message { get; }
@@ -71,7 +72,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         string WriterUniqueName { get; }
 
-        void Write(TelemetryInfoItemCollection telemetryInfoItemCollection);
+        // TODO: Pass array
+        void Write(TelemetryInfo telemetryInfo);
     }
 
     public class LogWriter : ITelemetryWriter
@@ -85,12 +87,12 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
         public string WriterUniqueName => TelemetryWriterUniqueNames.Log;
 
-        public void Write(TelemetryInfoItemCollection telemetryInfoItemCollection)
+        public void Write(TelemetryInfo telemetryInfo)
         {
-            var messageBuilder = new StringBuilder($"{telemetryInfoItemCollection.Message}: ");
+            var messageBuilder = new StringBuilder($"{telemetryInfo.Message}: ");
             var arguments = new List<object?>();
 
-            foreach (var telemetryInfoItem in telemetryInfoItemCollection)
+            foreach (var telemetryInfoItem in telemetryInfo)
             {
                 messageBuilder.Append($" {telemetryInfoItem.Key} = {{{telemetryInfoItem.Key}}};");
                 arguments.Add(telemetryInfoItem.Value);
@@ -107,9 +109,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
     public class TelemetryRouterOptions
     {
-        internal readonly List<Type> TelemetryWriterTypes = new();
-        internal readonly List<(string ProviderUniqueName, string[] WriterUniqueNames)> Mapping = new();
+        internal readonly List<TelemetryRouterEventOptions> EventOptions = new();
         internal readonly List<IStaticTelemetryDataProvider> StaticTelemetryDataProviders = new();
+        internal readonly List<Type> TelemetryWriterTypes = new();
 
         public void AddStaticTelemetryDataProvider(IStaticTelemetryDataProvider telemetryDataProvider)
         {
@@ -121,132 +123,206 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             TelemetryWriterTypes.Add(typeof(T));
         }
 
-        public void AddRouting(string providerUniqueName, params string[] writerUniqueNames)
+        public void AddEvent(string eventName, Action<TelemetryRouterEventOptions> configureOptions)
         {
-            if (string.IsNullOrEmpty(providerUniqueName))
-                throw new ArgumentNullException(nameof(providerUniqueName));
+            var telemetryRouterEventOptions = new TelemetryRouterEventOptions(eventName);
+            configureOptions.Invoke(telemetryRouterEventOptions);
 
-            Mapping.Add((providerUniqueName, writerUniqueNames));
+            EventOptions.Add(telemetryRouterEventOptions);
         }
     }
 
+    public class TelemetryRouterEventOptions
+    {
+        private readonly List<TelemetryRouterEventWriteDataAction> _writeDataActions = new();
+
+        public TelemetryRouterEventOptions(string eventName)
+        {
+            EventName = eventName;
+        }
+
+        public string EventName { get; }
+
+        public IEnumerable<TelemetryRouterEventWriteDataAction> EnumerationWriteDataActions()
+        {
+            return _writeDataActions.AsEnumerable();
+        }
+
+        private void AddWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction)
+        {
+            _writeDataActions.Add(writeDataAction);
+        }
+
+        // TODO: Consider using builder
+        public TelemetryRouterEventOptions WriteStaticData(string telemetryInfoName, params string[] telemetryWriterUniqueNames)
+        {
+            var writeDataAction =
+                new TelemetryRouterEventWriteDataAction(true, telemetryInfoName, telemetryWriterUniqueNames);
+            AddWriteDataAction(writeDataAction);
+            return this;
+        }
+
+        public TelemetryRouterEventOptions WriteEventData(string telemetryInfoName, params string[] telemetryWriterUniqueNames)
+        {
+            var writeDataAction =
+                new TelemetryRouterEventWriteDataAction(false, telemetryInfoName, telemetryWriterUniqueNames);
+            AddWriteDataAction(writeDataAction);
+            return this;
+        }
+    }
+
+    public static class DefaultTelemetryEventNames
+    {
+        public static string Initialization => "TelemetryRouter.Initialization";
+    }
+
+    public class TelemetryRouterEventWriteDataAction
+    {
+        public TelemetryRouterEventWriteDataAction(
+            bool isStatic,
+            string telemetryInfoName,
+            params string[] telemetryWriterUniqueNames)
+        {
+            IsStatic = isStatic;
+            TelemetryInfoName = telemetryInfoName;
+            TelemetryWriterUniqueNames = telemetryWriterUniqueNames;
+        }
+
+        public bool IsStatic { get; }
+
+        public string TelemetryInfoName { get; }
+
+        public string[] TelemetryWriterUniqueNames { get; }
+    }
+
+    // TODO Remove Static
     public class TelemetryRouter
     {
-        private static ILogger<TelemetryRouter>? _logger;
         private static readonly Dictionary<string, ITelemetryWriter> TelemetryWritersByUniqueName = new();
-        private static readonly IDictionary<string, HashSet<string>> WriterUniqueNamesByProviderUniqueName = new Dictionary<string, HashSet<string>>();
-        private static readonly IDictionary<string, HashSet<string>> ProviderUniqueNamesByWriterUniqueName = new Dictionary<string, HashSet<string>>();
-        private static readonly TelemetryData StaticTelemetryData = new();
+        private static readonly Dictionary<string, TelemetryRouterEventOptions> EventOptionsByName = new();
+
+        private static readonly TelemetryInfoStorage StaticTelemetryInfoStorage = new();
 
         internal static void Initialize(
-            ILogger<TelemetryRouter>? logger,
             TelemetryRouterOptions telemetryRouterOptions,
             IServiceProvider serviceProvider)
         {
-            _logger = logger;
-            foreach (var (providerUniqueName, writerUniqueNames) in telemetryRouterOptions.Mapping)
-            {
-                foreach (var writerUniqueName in writerUniqueNames)
-                {
-                    AddMapping(WriterUniqueNamesByProviderUniqueName, providerUniqueName, writerUniqueName);
-                    AddMapping(ProviderUniqueNamesByWriterUniqueName, writerUniqueName, providerUniqueName);
-                }
-            }
-
             foreach (var telemetryWriterType in telemetryRouterOptions.TelemetryWriterTypes)
             {
                 var telemetryWriter = (ITelemetryWriter)serviceProvider.GetRequiredService(telemetryWriterType);
                 TelemetryWritersByUniqueName.Add(telemetryWriter.WriterUniqueName, telemetryWriter);
             }
 
+            foreach (var telemetryRouterEventOptions in telemetryRouterOptions.EventOptions)
+            {
+                EventOptionsByName.Add(telemetryRouterEventOptions.EventName, telemetryRouterEventOptions);
+            }
+
             foreach (var telemetryInfoItemCollection in telemetryRouterOptions.StaticTelemetryDataProviders
                          .SelectMany(i => i.GetTelemetryData()))
-                StaticTelemetryData.AddData(telemetryInfoItemCollection);
-        }
-
-        private static void AddMapping(IDictionary<string, HashSet<string>> mappingDictionary, string from, string to)
-        {
-            if (mappingDictionary.TryGetValue(from, out var existingHashSet) is false)
             {
-                existingHashSet = new HashSet<string>();
-                mappingDictionary.Add(from, existingHashSet);
+                StaticTelemetryInfoStorage.AddData(telemetryInfoItemCollection);
             }
-
-            existingHashSet.Add(to);
         }
 
-        public static void WriteTelemetryInfo(TelemetryInfoItemCollection telemetryInfoItemCollection)
+        public static void ProcessTelemetryEvent(TelemetryEvent telemetryEvent)
         {
-            var providerUniqueName = telemetryInfoItemCollection.ProviderUniqueName;
-            if (WriterUniqueNamesByProviderUniqueName.TryGetValue(providerUniqueName, out var writerUniqueNames) is
-                false)
-            {
-                _logger?.LogWarning($"Не найдены писатели для данных от поставщика {providerUniqueName}");
+            if (EventOptionsByName.TryGetValue(telemetryEvent.EventName, out var telemetryRouterEventOptions) is false)
                 return;
-            }
 
-            foreach (var writerUniqueName in writerUniqueNames)
+            foreach (var writeDataAction in telemetryRouterEventOptions.EnumerationWriteDataActions())
             {
-                if (TelemetryWritersByUniqueName.TryGetValue(writerUniqueName, out var telemetryWriter) is false)
-                    continue;
-
-                telemetryWriter.Write(telemetryInfoItemCollection);
+                ProcessWriteDataAction(writeDataAction, telemetryEvent.TelemetryInfos);
             }
         }
 
-        public static TelemetryInfoItemCollection[] GetStaticTelemetryDataFor(string writerUniqueName)
+        private static ITelemetryWriter? TryGetTelemetryWriter(string writerUniqueName)
         {
-            if (ProviderUniqueNamesByWriterUniqueName.TryGetValue(writerUniqueName, out var providerUniqueNames) is
-                false)
-                return Array.Empty<TelemetryInfoItemCollection>();
+            if (TelemetryWritersByUniqueName.TryGetValue(writerUniqueName, out var telemetryWriter))
+                return telemetryWriter;
 
-            return providerUniqueNames
-                .SelectMany(providerUniqueName => StaticTelemetryData.GetDataFor(providerUniqueName))
-                .ToArray();
+            return null;
+        }
+
+        private static void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction, TelemetryInfo[] telemetryInfos)
+        {
+            var telemetryWriters = writeDataAction.TelemetryWriterUniqueNames
+                .Select(TryGetTelemetryWriter)
+                .Where(i => i is not null)
+                .Cast<ITelemetryWriter>();
+
+            var telemetryInfosToWrite = writeDataAction.IsStatic
+                ? StaticTelemetryInfoStorage.GetDataFor(writeDataAction.TelemetryInfoName).ToArray()
+                : telemetryInfos.Where(i => i.ProviderUniqueName == writeDataAction.TelemetryInfoName).ToArray();
+
+            foreach (var telemetryWriter in telemetryWriters)
+            {
+                foreach (var telemetryInfo in telemetryInfosToWrite) 
+                    telemetryWriter.Write(telemetryInfo);
+            }
+        }
+
+        // TODO: Remove
+        public static TelemetryInfo[] GetStaticTelemetryInfoFor(string writerUniqueName)
+        {
+            return Array.Empty<TelemetryInfo>();
         }
     }
 
-    internal class TelemetryData
+    public class TelemetryEvent
     {
-        private readonly ConcurrentDictionary<string, List<TelemetryInfoItemCollection>>
+        public TelemetryEvent(string eventName, params TelemetryInfo[] telemetryInfos)
+        {
+            EventName = eventName;
+            TelemetryInfos = telemetryInfos;
+        }
+
+        public string EventName { get; }
+
+        public TelemetryInfo[] TelemetryInfos { get; }
+    }
+
+    internal class TelemetryInfoStorage
+    {
+        private readonly ConcurrentDictionary<string, List<TelemetryInfo>>
             _telemetryInfoByProviderUniqueName = new();
 
-        public void AddData(TelemetryInfoItemCollection telemetryInfoItemCollection)
+        public void AddData(TelemetryInfo telemetryInfo)
         {
-            var providerUniqueName = telemetryInfoItemCollection.ProviderUniqueName;
+            var providerUniqueName = telemetryInfo.ProviderUniqueName;
             _telemetryInfoByProviderUniqueName.AddOrUpdate(
                 providerUniqueName,
-                _ => new List<TelemetryInfoItemCollection> { telemetryInfoItemCollection },
+                _ => new List<TelemetryInfo> { telemetryInfo },
                 (_, existingList) =>
                 {
-                    existingList.Add(telemetryInfoItemCollection);
+                    existingList.Add(telemetryInfo);
                     return existingList;
                 });
         }
 
-        public IEnumerable<TelemetryInfoItemCollection> GetDataFor(string providerUniqueName)
+        public IEnumerable<TelemetryInfo> GetDataFor(string providerUniqueName)
         {
             if (_telemetryInfoByProviderUniqueName.TryGetValue(providerUniqueName, out var list))
                 return list;
 
-            return Enumerable.Empty<TelemetryInfoItemCollection>();
+            return Enumerable.Empty<TelemetryInfo>();
         }
     }
 
     public interface IStaticTelemetryDataProvider
     {
-        TelemetryInfoItemCollection[] GetTelemetryData();
+        TelemetryInfo[] GetTelemetryData();
     }
 
     public class BuildConfigurationStaticTelemetryDataProvider : IStaticTelemetryDataProvider
     {
-        public TelemetryInfoItemCollection[] GetTelemetryData()
+        public TelemetryInfo[] GetTelemetryData()
         {
             const string buildEnvironmentKeyPrefix = "BUILD_";
             const string telemetryKeyPrefix = "build.";
 
-            var telemetryInfoItemCollection = new TelemetryInfoItemCollection(
-                TelemetryProviderUniqueNames.BuildConfiguration,
+            var telemetryInfoItemCollection = new TelemetryInfo(
+                StaticTelemetryProviderUniqueNames.BuildConfiguration,
                 "Build Configuration");
 
             var variables = Environment.GetEnvironmentVariables();
@@ -272,30 +348,27 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         }
     }
 
-    public static class TelemetryProviderUniqueNames
+    public static class StaticTelemetryProviderUniqueNames
     {
-        public static string BuildConfiguration => "BuildConfiguration";
+        public static string BuildConfiguration => "Static.BuildConfiguration";
     }
 
     public class InitializeTelemetryRouterHostedService : IHostedService
     {
-        private readonly ILogger<TelemetryRouter> _logger;
         private readonly IOptions<TelemetryRouterOptions> _options;
         private readonly IServiceProvider _serviceProvider;
 
         public InitializeTelemetryRouterHostedService(
-            ILogger<TelemetryRouter> logger,
             IOptions<TelemetryRouterOptions> options,
             IServiceProvider serviceProvider)
         {
-            _logger = logger;
             _options = options;
             _serviceProvider = serviceProvider;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            TelemetryRouter.Initialize(_logger, _options.Value, _serviceProvider);
+            TelemetryRouter.Initialize(_options.Value, _serviceProvider);
             return Task.CompletedTask;
         }
 

@@ -56,16 +56,16 @@ builder.Services.Configure<TelemetryRouterOptions>(o =>
 {
     o.AddEvent(TelemetryHttpEventNames.Request, eventOptions => eventOptions
         .WriteEventData(
-            TelemetryHttpProviderUniqueNames.Request, 
+            HttpTelemetryUniqueNames.Request, 
             TelemetryActivityWriterUniqueNames.Event,
             TelemetryActivityWriterUniqueNames.Tag,
             TelemetryWriterUniqueNames.LogProperty)
         .WriteStaticData(
-            StaticTelemetryProviderUniqueNames.BuildConfiguration,
+            StaticTelemetryUniqueNames.BuildConfiguration,
             TelemetryActivityWriterUniqueNames.Tag));
     o.AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
         .WriteStaticData(
-            StaticTelemetryProviderUniqueNames.BuildConfiguration, 
+            StaticTelemetryUniqueNames.BuildConfiguration, 
             TelemetryWriterUniqueNames.LogProperty));
     o.AddWriter<LogWriter>();
     o.AddWriter<LogPropertyWriter>();

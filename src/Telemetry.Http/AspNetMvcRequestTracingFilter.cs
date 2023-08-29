@@ -42,7 +42,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
             CancellationToken cancellationToken)
         {
             var telemetryInfos = new TelemetryInfo(
-                TelemetryHttpProviderUniqueNames.Request,
+                HttpTelemetryUniqueNames.Request,
                 "Action Executing")
             {
                 { "http.request.header.accept", context.HttpContext.Request.Headers["accept"].ToArray() },
@@ -261,7 +261,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
         }
     }
 
-    public static class TelemetryHttpProviderUniqueNames
+    public static class HttpTelemetryUniqueNames
     {
         public static string Request => "Http.Request.Default";
     }

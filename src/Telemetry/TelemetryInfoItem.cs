@@ -30,14 +30,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         private readonly List<TelemetryInfoItem> _telemetryInfoItems = new();
 
-        public TelemetryInfo(string providerUniqueName, string message)
+        public TelemetryInfo(string telemetryUniqueName, string message)
         {
-            ProviderUniqueName = providerUniqueName ?? throw new ArgumentNullException(nameof(providerUniqueName));
+            TelemetryUniqueName = telemetryUniqueName ?? throw new ArgumentNullException(nameof(telemetryUniqueName));
             Message = message ?? throw new ArgumentNullException(nameof(message));
         }
 
-        // TODO: Rename to TelemetryName
-        public string ProviderUniqueName { get; }
+        public string TelemetryUniqueName { get; }
 
         public string Message { get; }
 
@@ -255,7 +254,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
             var telemetryInfosToWrite = writeDataAction.IsStatic
                 ? StaticTelemetryInfoStorage.GetDataFor(writeDataAction.TelemetryInfoName).ToArray()
-                : telemetryInfos.Where(i => i.ProviderUniqueName == writeDataAction.TelemetryInfoName).ToArray();
+                : telemetryInfos.Where(i => i.TelemetryUniqueName == writeDataAction.TelemetryInfoName).ToArray();
 
             foreach (var telemetryWriter in telemetryWriters)
                 telemetryWriter.Write(telemetryInfosToWrite, writeDataAction.IsStatic);
@@ -278,13 +277,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     internal class TelemetryInfoStorage
     {
         private readonly ConcurrentDictionary<string, List<TelemetryInfo>>
-            _telemetryInfoByProviderUniqueName = new();
+            _telemetryInfosByUniqueName = new();
 
         public void AddData(TelemetryInfo telemetryInfo)
         {
-            var providerUniqueName = telemetryInfo.ProviderUniqueName;
-            _telemetryInfoByProviderUniqueName.AddOrUpdate(
-                providerUniqueName,
+            var telemetryUniqueName = telemetryInfo.TelemetryUniqueName;
+            _telemetryInfosByUniqueName.AddOrUpdate(
+                telemetryUniqueName,
                 _ => new List<TelemetryInfo> { telemetryInfo },
                 (_, existingList) =>
                 {
@@ -293,9 +292,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
                 });
         }
 
-        public IEnumerable<TelemetryInfo> GetDataFor(string providerUniqueName)
+        public IEnumerable<TelemetryInfo> GetDataFor(string telemetryUniqueName)
         {
-            if (_telemetryInfoByProviderUniqueName.TryGetValue(providerUniqueName, out var list))
+            if (_telemetryInfosByUniqueName.TryGetValue(telemetryUniqueName, out var list))
                 return list;
 
             return Enumerable.Empty<TelemetryInfo>();
@@ -315,7 +314,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             const string telemetryKeyPrefix = "build.";
 
             var telemetryInfoItemCollection = new TelemetryInfo(
-                StaticTelemetryProviderUniqueNames.BuildConfiguration,
+                StaticTelemetryUniqueNames.BuildConfiguration,
                 "Build Configuration");
 
             var variables = Environment.GetEnvironmentVariables();
@@ -341,7 +340,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         }
     }
 
-    public static class StaticTelemetryProviderUniqueNames
+    public static class StaticTelemetryUniqueNames
     {
         public static string BuildConfiguration => "Static.BuildConfiguration";
     }

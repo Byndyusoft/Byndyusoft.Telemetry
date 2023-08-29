@@ -63,17 +63,12 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         }
     }
 
-    public static class TelemetryWriterNames
-    {
-        public static string Log => "Log";
-    }
-
     public interface ITelemetryWriter
     {
         string WriterUniqueName { get; }
 
         // TODO: Pass array
-        void Write(TelemetryInfo telemetryInfo);
+        void Write(TelemetryInfo telemetryInfo, bool isStaticData);
     }
 
     public class LogWriter : ITelemetryWriter
@@ -87,7 +82,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
         public string WriterUniqueName => TelemetryWriterUniqueNames.Log;
 
-        public void Write(TelemetryInfo telemetryInfo)
+        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
         {
             var messageBuilder = new StringBuilder($"{telemetryInfo.Message}: ");
             var arguments = new List<object?>();
@@ -105,6 +100,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     public static class TelemetryWriterUniqueNames
     {
         public static string Log => "Log";
+
+        public static string LogProperty => "LogProperty";
     }
 
     public class TelemetryRouterOptions
@@ -258,14 +255,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             foreach (var telemetryWriter in telemetryWriters)
             {
                 foreach (var telemetryInfo in telemetryInfosToWrite) 
-                    telemetryWriter.Write(telemetryInfo);
+                    telemetryWriter.Write(telemetryInfo, writeDataAction.IsStatic);
             }
-        }
-
-        // TODO: Remove
-        public static TelemetryInfo[] GetStaticTelemetryInfoFor(string writerUniqueName)
-        {
-            return Array.Empty<TelemetryInfo>();
         }
     }
 
@@ -375,6 +366,47 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
+        }
+    }
+
+    public class LogPropertyWriter : ITelemetryWriter
+    {
+        public string WriterUniqueName => TelemetryWriterUniqueNames.LogProperty;
+
+        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
+        {
+            LogPropertyTelemetryDataAccessor.AddTelemetryInfos(new[] { telemetryInfo }, isStaticData);
+        }
+    }
+
+    public static class LogPropertyTelemetryDataAccessor
+    {
+        private static readonly List<TelemetryInfo> StaticData = new();
+        private static readonly AsyncLocal<EventDataHolder> EventDataCurrent = new();
+
+        internal static void AddTelemetryInfos(TelemetryInfo[] telemetryInfos, bool isStaticData)
+        {
+            if (isStaticData)
+                StaticData.AddRange(telemetryInfos);
+            else
+            {
+                EventDataCurrent.Value ??= new EventDataHolder();
+                EventDataCurrent.Value.EventData.AddRange(telemetryInfos);
+            }
+        }
+
+        public static IEnumerable<TelemetryInfo> GetTelemetryData()
+        {
+            if (EventDataCurrent.Value is null)
+                return Enumerable.Empty<TelemetryInfo>();
+
+            return StaticData.Concat(EventDataCurrent.Value.EventData);
+        }
+
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private class EventDataHolder
+        {
+            public readonly List<TelemetryInfo> EventData = new();
         }
     }
 }

@@ -58,20 +58,23 @@ builder.Services.Configure<TelemetryRouterOptions>(o =>
         .WriteEventData(
             TelemetryHttpProviderUniqueNames.Request, 
             TelemetryActivityWriterUniqueNames.Event,
-            TelemetryActivityWriterUniqueNames.Tag)
+            TelemetryActivityWriterUniqueNames.Tag,
+            TelemetryWriterUniqueNames.LogProperty)
         .WriteStaticData(
             StaticTelemetryProviderUniqueNames.BuildConfiguration,
             TelemetryActivityWriterUniqueNames.Tag));
     o.AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
         .WriteStaticData(
             StaticTelemetryProviderUniqueNames.BuildConfiguration, 
-            SerilogTelemetryWriterUniqueNames.Property));
+            TelemetryWriterUniqueNames.LogProperty));
     o.AddWriter<LogWriter>();
+    o.AddWriter<LogPropertyWriter>();
     o.AddWriter<ActivityTagWriter>();
     o.AddWriter<ActivityEventWriter>();
     o.AddStaticTelemetryDataProvider(new BuildConfigurationStaticTelemetryDataProvider());
 });
 builder.Services.AddSingleton<LogWriter>();
+builder.Services.AddSingleton<LogPropertyWriter>();
 builder.Services.AddSingleton<ActivityTagWriter>();
 builder.Services.AddSingleton<ActivityEventWriter>();
 builder.Services.AddHostedService<InitializeTelemetryRouterHostedService>();

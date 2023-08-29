@@ -8,7 +8,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
     {
         public string WriterUniqueName => TelemetryActivityWriterUniqueNames.Tag;
 
-        public void Write(TelemetryInfo telemetryInfo)
+        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
         {
             var activity = Activity.Current;
             if (activity is null)
@@ -23,7 +23,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
     {
         public string WriterUniqueName => TelemetryActivityWriterUniqueNames.Event;
 
-        public void Write(TelemetryInfo telemetryInfo)
+        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
         {
             var activity = Activity.Current;
             if (activity is null)

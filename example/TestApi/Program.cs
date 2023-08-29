@@ -34,8 +34,6 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var otlpExporterOptions = new OtlpExporterOptions();
-builder.Configuration.GetSection("Jaeger").Bind(otlpExporterOptions);
 builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 {
     var serviceName = builder.Configuration.GetValue<string>("Jaeger:ServiceName");

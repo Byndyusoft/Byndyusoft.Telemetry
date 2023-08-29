@@ -78,6 +78,7 @@ builder.Services.AddSingleton<LogPropertyWriter>();
 builder.Services.AddSingleton<ActivityTagWriter>();
 builder.Services.AddSingleton<ActivityEventWriter>();
 builder.Services.AddHostedService<InitializeTelemetryRouterHostedService>();
+builder.Services.AddSingleton<ITelemetryRouter, TelemetryRouter>();
 
 var app = builder.Build();
 

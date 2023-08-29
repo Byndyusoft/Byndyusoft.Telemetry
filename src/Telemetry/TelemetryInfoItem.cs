@@ -196,39 +196,43 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         public string[] TelemetryWriterUniqueNames { get; }
     }
 
-    // TODO Remove Static
-    public class TelemetryRouter
+    public interface ITelemetryRouter
     {
-        private static readonly Dictionary<string, ITelemetryWriter> TelemetryWritersByUniqueName = new();
-        private static readonly Dictionary<string, TelemetryRouterEventOptions> EventOptionsByName = new();
+        void ProcessTelemetryEvent(TelemetryEvent telemetryEvent);
+    }
 
-        private static readonly TelemetryInfoStorage StaticTelemetryInfoStorage = new();
+    public class TelemetryRouter : ITelemetryRouter
+    {
+        private readonly Dictionary<string, ITelemetryWriter> _telemetryWritersByUniqueName = new();
+        private readonly Dictionary<string, TelemetryRouterEventOptions> _eventOptionsByName = new();
 
-        internal static void Initialize(
+        private readonly TelemetryInfoStorage _staticTelemetryInfoStorage = new();
+
+        internal void Initialize(
             TelemetryRouterOptions telemetryRouterOptions,
             IServiceProvider serviceProvider)
         {
             foreach (var telemetryWriterType in telemetryRouterOptions.TelemetryWriterTypes)
             {
                 var telemetryWriter = (ITelemetryWriter)serviceProvider.GetRequiredService(telemetryWriterType);
-                TelemetryWritersByUniqueName.Add(telemetryWriter.WriterUniqueName, telemetryWriter);
+                _telemetryWritersByUniqueName.Add(telemetryWriter.WriterUniqueName, telemetryWriter);
             }
 
             foreach (var telemetryRouterEventOptions in telemetryRouterOptions.EventOptions)
             {
-                EventOptionsByName.Add(telemetryRouterEventOptions.EventName, telemetryRouterEventOptions);
+                _eventOptionsByName.Add(telemetryRouterEventOptions.EventName, telemetryRouterEventOptions);
             }
 
-            foreach (var telemetryInfoItemCollection in telemetryRouterOptions.StaticTelemetryDataProviders
+            foreach (var telemetryInfo in telemetryRouterOptions.StaticTelemetryDataProviders
                          .SelectMany(i => i.GetTelemetryData()))
             {
-                StaticTelemetryInfoStorage.AddData(telemetryInfoItemCollection);
+                _staticTelemetryInfoStorage.AddData(telemetryInfo);
             }
         }
 
-        public static void ProcessTelemetryEvent(TelemetryEvent telemetryEvent)
+        public void ProcessTelemetryEvent(TelemetryEvent telemetryEvent)
         {
-            if (EventOptionsByName.TryGetValue(telemetryEvent.EventName, out var telemetryRouterEventOptions) is false)
+            if (_eventOptionsByName.TryGetValue(telemetryEvent.EventName, out var telemetryRouterEventOptions) is false)
                 return;
 
             foreach (var writeDataAction in telemetryRouterEventOptions.EnumerationWriteDataActions())
@@ -237,15 +241,15 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             }
         }
 
-        private static ITelemetryWriter? TryGetTelemetryWriter(string writerUniqueName)
+        private ITelemetryWriter? TryGetTelemetryWriter(string writerUniqueName)
         {
-            if (TelemetryWritersByUniqueName.TryGetValue(writerUniqueName, out var telemetryWriter))
+            if (_telemetryWritersByUniqueName.TryGetValue(writerUniqueName, out var telemetryWriter))
                 return telemetryWriter;
 
             return null;
         }
 
-        private static void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction, TelemetryInfo[] telemetryInfos)
+        private void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction, TelemetryInfo[] telemetryInfos)
         {
             var telemetryWriters = writeDataAction.TelemetryWriterUniqueNames
                 .Select(TryGetTelemetryWriter)
@@ -253,7 +257,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
                 .Cast<ITelemetryWriter>();
 
             var telemetryInfosToWrite = writeDataAction.IsStatic
-                ? StaticTelemetryInfoStorage.GetDataFor(writeDataAction.TelemetryInfoName).ToArray()
+                ? _staticTelemetryInfoStorage.GetData(writeDataAction.TelemetryInfoName).ToArray()
                 : telemetryInfos.Where(i => i.TelemetryUniqueName == writeDataAction.TelemetryInfoName).ToArray();
 
             foreach (var telemetryWriter in telemetryWriters)
@@ -292,7 +296,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
                 });
         }
 
-        public IEnumerable<TelemetryInfo> GetDataFor(string telemetryUniqueName)
+        public IEnumerable<TelemetryInfo> GetData(string telemetryUniqueName)
         {
             if (_telemetryInfosByUniqueName.TryGetValue(telemetryUniqueName, out var list))
                 return list;
@@ -313,7 +317,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             const string buildEnvironmentKeyPrefix = "BUILD_";
             const string telemetryKeyPrefix = "build.";
 
-            var telemetryInfoItemCollection = new TelemetryInfo(
+            var telemetryInfo = new TelemetryInfo(
                 StaticTelemetryUniqueNames.BuildConfiguration,
                 "Build Configuration");
 
@@ -332,11 +336,11 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
                 {
                     var key = property.Remove(0, buildEnvironmentKeyPrefix.Length);
                     key = $"{telemetryKeyPrefix}{key.ToLowerInvariant()}";
-                    telemetryInfoItemCollection.Add(key, value);
+                    telemetryInfo.Add(key, value);
                 }
             }
 
-            return new[] { telemetryInfoItemCollection };
+            return new[] { telemetryInfo };
         }
     }
 
@@ -349,18 +353,21 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         private readonly IOptions<TelemetryRouterOptions> _options;
         private readonly IServiceProvider _serviceProvider;
+        private readonly TelemetryRouter _telemetryRouter;
 
         public InitializeTelemetryRouterHostedService(
             IOptions<TelemetryRouterOptions> options,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            ITelemetryRouter telemetryRouter)
         {
             _options = options;
             _serviceProvider = serviceProvider;
+            _telemetryRouter = (TelemetryRouter)telemetryRouter;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            TelemetryRouter.Initialize(_options.Value, _serviceProvider);
+            _telemetryRouter.Initialize(_options.Value, _serviceProvider);
             return Task.CompletedTask;
         }
 

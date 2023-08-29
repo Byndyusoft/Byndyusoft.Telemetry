@@ -8,13 +8,19 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
     {
         public string WriterUniqueName => TelemetryActivityWriterUniqueNames.Tag;
 
-        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
+        public void Write(TelemetryInfo[] telemetryInfos, bool isStaticData)
         {
             var activity = Activity.Current;
             if (activity is null)
                 return;
 
-            foreach (var telemetryInfoItem in telemetryInfo)
+            foreach (var telemetryInfo in telemetryInfos)
+                Write(telemetryInfo, activity);
+        }
+
+        private void Write(TelemetryInfo telemetryInfos, Activity activity)
+        {
+            foreach (var telemetryInfoItem in telemetryInfos)
                 activity.SetTag(telemetryInfoItem.Key, telemetryInfoItem.Value);
         }
     }
@@ -23,12 +29,18 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
     {
         public string WriterUniqueName => TelemetryActivityWriterUniqueNames.Event;
 
-        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
+        public void Write(TelemetryInfo[] telemetryInfos, bool isStaticData)
         {
             var activity = Activity.Current;
             if (activity is null)
                 return;
 
+            foreach (var telemetryInfo in telemetryInfos) 
+                Write(telemetryInfo, activity);
+        }
+
+        private void Write(TelemetryInfo telemetryInfo, Activity activity)
+        {
             var activityTagsCollection =
                 new ActivityTagsCollection(
                     telemetryInfo.Select(i => new KeyValuePair<string, object?>(i.Key, i.Value)));

@@ -67,8 +67,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         string WriterUniqueName { get; }
 
-        // TODO: Pass array
-        void Write(TelemetryInfo telemetryInfo, bool isStaticData);
+        void Write(TelemetryInfo[] telemetryInfos, bool isStaticData);
     }
 
     public class LogWriter : ITelemetryWriter
@@ -82,7 +81,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
         public string WriterUniqueName => TelemetryWriterUniqueNames.Log;
 
-        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
+        public void Write(TelemetryInfo[] telemetryInfos, bool isStaticData)
+        {
+            foreach (var telemetryInfo in telemetryInfos) 
+                Write(telemetryInfo);
+        }
+
+        public void Write(TelemetryInfo telemetryInfo)
         {
             var messageBuilder = new StringBuilder($"{telemetryInfo.Message}: ");
             var arguments = new List<object?>();
@@ -253,10 +258,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
                 : telemetryInfos.Where(i => i.ProviderUniqueName == writeDataAction.TelemetryInfoName).ToArray();
 
             foreach (var telemetryWriter in telemetryWriters)
-            {
-                foreach (var telemetryInfo in telemetryInfosToWrite) 
-                    telemetryWriter.Write(telemetryInfo, writeDataAction.IsStatic);
-            }
+                telemetryWriter.Write(telemetryInfosToWrite, writeDataAction.IsStatic);
         }
     }
 
@@ -373,9 +375,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         public string WriterUniqueName => TelemetryWriterUniqueNames.LogProperty;
 
-        public void Write(TelemetryInfo telemetryInfo, bool isStaticData)
+        public void Write(TelemetryInfo[] telemetryInfos, bool isStaticData)
         {
-            LogPropertyTelemetryDataAccessor.AddTelemetryInfos(new[] { telemetryInfo }, isStaticData);
+            LogPropertyTelemetryDataAccessor.AddTelemetryInfos(telemetryInfos, isStaticData);
         }
     }
 

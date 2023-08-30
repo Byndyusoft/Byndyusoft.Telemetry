@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Data;
 using Byndyusoft.MaskedSerialization.Newtonsoft.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -44,7 +45,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
             ActionExecutionDelegate next,
             CancellationToken cancellationToken)
         {
-            var telemetryInfos = new TelemetryInfo(
+            var telemetryInfo = new TelemetryInfo(
                 HttpTelemetryUniqueNames.Request,
                 "Action Executing")
             {
@@ -59,10 +60,10 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 
                 var json = await _options.FormatAsync(value, cancellationToken)
                     .ConfigureAwait(false);
-                telemetryInfos.Add($"http.request.params.{name}", json);
+                telemetryInfo.Add($"http.request.params.{name}", json);
             }
 
-            var telemetryEvent = new TelemetryEvent(TelemetryHttpEventNames.Request, telemetryInfos);
+            var telemetryEvent = new TelemetryEvent(TelemetryHttpEventNames.Request, telemetryInfo);
             _telemetryRouter.ProcessTelemetryEvent(telemetryEvent);
 
             await next();

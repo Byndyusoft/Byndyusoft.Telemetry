@@ -1,12 +1,16 @@
 using System;
 using Byndyusoft.AspNetCore.Mvc.Telemetry;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Definitions;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Http;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Options;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;

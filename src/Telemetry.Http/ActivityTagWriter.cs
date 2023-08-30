@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Data;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers.Interfaces;
 
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 {

@@ -228,6 +228,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             {
                 _staticTelemetryInfoStorage.AddData(telemetryInfo);
             }
+
+            var initializationTelemetryEvent = new TelemetryEvent(DefaultTelemetryEventNames.Initialization);
+            ProcessTelemetryEvent(initializationTelemetryEvent);
         }
 
         public void ProcessTelemetryEvent(TelemetryEvent telemetryEvent)
@@ -406,7 +409,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
         public static IEnumerable<TelemetryInfo> GetTelemetryData()
         {
             if (EventDataCurrent.Value is null)
-                return Enumerable.Empty<TelemetryInfo>();
+                return StaticData.AsEnumerable();
 
             return StaticData.Concat(EventDataCurrent.Value.EventData);
         }

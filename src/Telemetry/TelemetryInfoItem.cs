@@ -105,7 +105,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
     {
         public static string Log => "Log";
 
-        public static string LogProperty => "LogProperty";
+        public static string LogPropertyAccessor => "LogPropertyAccessor";
     }
 
     public class TelemetryRouterOptions
@@ -382,7 +382,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
     public class LogPropertyWriter : ITelemetryWriter
     {
-        public string WriterUniqueName => TelemetryWriterUniqueNames.LogProperty;
+        public string WriterUniqueName => TelemetryWriterUniqueNames.LogPropertyAccessor;
 
         public void Write(TelemetryInfo[] telemetryInfos, bool isStaticData)
         {

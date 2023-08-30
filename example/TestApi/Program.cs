@@ -34,8 +34,6 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var otlpExporterOptions = new OtlpExporterOptions();
-builder.Configuration.GetSection("Jaeger").Bind(otlpExporterOptions);
 builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 {
     var serviceName = builder.Configuration.GetValue<string>("Jaeger:ServiceName");
@@ -59,14 +57,14 @@ builder.Services.Configure<TelemetryRouterOptions>(o =>
             HttpTelemetryUniqueNames.Request, 
             TelemetryActivityWriterUniqueNames.Event,
             TelemetryActivityWriterUniqueNames.Tag,
-            TelemetryWriterUniqueNames.LogProperty)
+            TelemetryWriterUniqueNames.LogPropertyAccessor)
         .WriteStaticData(
             StaticTelemetryUniqueNames.BuildConfiguration,
             TelemetryActivityWriterUniqueNames.Tag));
     o.AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
         .WriteStaticData(
             StaticTelemetryUniqueNames.BuildConfiguration, 
-            TelemetryWriterUniqueNames.LogProperty));
+            TelemetryWriterUniqueNames.LogPropertyAccessor));
     o.AddWriter<LogWriter>();
     o.AddWriter<LogPropertyWriter>();
     o.AddWriter<ActivityTagWriter>();

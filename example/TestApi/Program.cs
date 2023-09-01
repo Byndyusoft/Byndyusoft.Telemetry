@@ -4,6 +4,7 @@ using Byndyusoft.AspNetCore.Mvc.Telemetry.Http;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,11 +63,13 @@ builder.Services.AddTelemetryRouter(telemetryRouterOptions => telemetryRouterOpt
     .AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
         .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
         .To(TelemetryWriterUniqueNames.LogPropertyAccessor))
-    .AddWriter<LogWriter>()
-    .AddWriter<LogPropertyWriter>()
-    .AddWriter<ActivityTagWriter>()
-    .AddWriter<ActivityEventWriter>()
     .AddStaticTelemetryDataProvider(new BuildConfigurationStaticTelemetryDataProvider()));
+
+builder.Services
+    .AddTelemetryWriter<LogWriter>()
+    .AddTelemetryWriter<LogPropertyWriter>()
+    .AddTelemetryWriter<ActivityTagWriter>()
+    .AddTelemetryWriter<ActivityEventWriter>();
 
 var app = builder.Build();
 

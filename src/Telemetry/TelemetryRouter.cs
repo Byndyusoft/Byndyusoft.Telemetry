@@ -20,9 +20,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             TelemetryRouterOptions telemetryRouterOptions,
             IServiceProvider serviceProvider)
         {
-            foreach (var telemetryWriterType in telemetryRouterOptions.TelemetryWriterTypes)
+            var telemetryWriters = serviceProvider.GetServices<ITelemetryWriter>();
+            foreach (var telemetryWriter in telemetryWriters)
             {
-                var telemetryWriter = (ITelemetryWriter)serviceProvider.GetRequiredService(telemetryWriterType);
                 _telemetryWritersByUniqueName.Add(telemetryWriter.WriterUniqueName, telemetryWriter);
             }
 

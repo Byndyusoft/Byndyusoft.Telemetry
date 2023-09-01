@@ -2,6 +2,7 @@
 using Byndyusoft.AspNetCore.Mvc.Telemetry;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Options;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers.Interfaces;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -12,20 +13,18 @@ namespace Microsoft.Extensions.DependencyInjection
             this IServiceCollection services,
             Action<TelemetryRouterOptions> configureOptions)
         {
-            services.Configure(configureOptions);
-
-            services.PostConfigure<TelemetryRouterOptions>(options =>
-            {
-                foreach (var writerType in options.TelemetryWriterTypes)
-                {
-                    services.AddSingleton(writerType);
-                }
-            });
+            services.Configure<TelemetryRouterOptions>(configureOptions.Invoke);
 
             services.AddSingleton<ITelemetryRouter, TelemetryRouter>();
             services.AddHostedService<InitializeTelemetryRouterHostedService>();
 
             return services;
+        }
+
+        public static IServiceCollection AddTelemetryWriter<T>(this IServiceCollection services)
+            where T : class, ITelemetryWriter
+        {
+            return services.AddSingleton<ITelemetryWriter, T>();
         }
     }
 }

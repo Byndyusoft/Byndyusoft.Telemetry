@@ -52,27 +52,27 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             }
         }
 
+        private void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction, TelemetryInfo[] telemetryInfos)
+        {
+            var telemetryWriters = writeDataAction.TelemetryWriterUniqueNames
+                .Select(TryGetTelemetryWriter)
+                .Where(telemetryWriter => telemetryWriter is not null)
+                .Cast<ITelemetryWriter>();
+
+            var telemetryInfosToWrite = writeDataAction.IsStatic
+                ? _staticTelemetryInfoStorage.GetData(writeDataAction.TelemetryUniqueName).ToArray()
+                : telemetryInfos.Where(i => i.TelemetryUniqueName.Equals(writeDataAction.TelemetryUniqueName)).ToArray();
+
+            foreach (var telemetryWriter in telemetryWriters)
+                telemetryWriter.Write(telemetryInfosToWrite, writeDataAction.IsStatic);
+        }
+
         private ITelemetryWriter? TryGetTelemetryWriter(string writerUniqueName)
         {
             if (_telemetryWritersByUniqueName.TryGetValue(writerUniqueName, out var telemetryWriter))
                 return telemetryWriter;
 
             return null;
-        }
-
-        private void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction, TelemetryInfo[] telemetryInfos)
-        {
-            var telemetryWriters = writeDataAction.TelemetryWriterUniqueNames
-                .Select(TryGetTelemetryWriter)
-                .Where(i => i is not null)
-                .Cast<ITelemetryWriter>();
-
-            var telemetryInfosToWrite = writeDataAction.IsStatic
-                ? _staticTelemetryInfoStorage.GetData(writeDataAction.TelemetryInfoName).ToArray()
-                : telemetryInfos.Where(i => i.TelemetryUniqueName == writeDataAction.TelemetryInfoName).ToArray();
-
-            foreach (var telemetryWriter in telemetryWriters)
-                telemetryWriter.Write(telemetryInfosToWrite, writeDataAction.IsStatic);
         }
     }
 }

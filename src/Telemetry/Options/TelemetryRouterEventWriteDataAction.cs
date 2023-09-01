@@ -4,17 +4,17 @@
     {
         public TelemetryRouterEventWriteDataAction(
             bool isStatic,
-            string telemetryInfoName,
+            string telemetryUniqueName,
             params string[] telemetryWriterUniqueNames)
         {
             IsStatic = isStatic;
-            TelemetryInfoName = telemetryInfoName;
+            TelemetryUniqueName = telemetryUniqueName;
             TelemetryWriterUniqueNames = telemetryWriterUniqueNames;
         }
 
         public bool IsStatic { get; }
 
-        public string TelemetryInfoName { get; }
+        public string TelemetryUniqueName { get; }
 
         public string[] TelemetryWriterUniqueNames { get; }
     }

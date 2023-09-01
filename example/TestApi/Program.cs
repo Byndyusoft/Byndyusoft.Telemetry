@@ -4,7 +4,6 @@ using Byndyusoft.AspNetCore.Mvc.Telemetry.Http;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -11,10 +11,21 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 {
     public class TelemetryRouter : ITelemetryRouter
     {
-        private readonly Dictionary<string, ITelemetryWriter> _telemetryWritersByUniqueName = new();
         private readonly Dictionary<string, TelemetryRouterEventOptions> _eventOptionsByName = new();
 
         private readonly TelemetryInfoStorage _staticTelemetryInfoStorage = new();
+        private readonly Dictionary<string, ITelemetryWriter> _telemetryWritersByUniqueName = new();
+
+        public void ProcessTelemetryEvent(TelemetryEvent telemetryEvent)
+        {
+            if (_eventOptionsByName.TryGetValue(telemetryEvent.EventName, out var telemetryRouterEventOptions) is false)
+                return;
+
+            foreach (var writeDataAction in telemetryRouterEventOptions.EnumerationWriteDataActions())
+            {
+                ProcessWriteDataAction(writeDataAction, telemetryEvent.TelemetryInfos);
+            }
+        }
 
         internal void Initialize(
             TelemetryRouterOptions telemetryRouterOptions,
@@ -41,18 +52,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             ProcessTelemetryEvent(initializationTelemetryEvent);
         }
 
-        public void ProcessTelemetryEvent(TelemetryEvent telemetryEvent)
-        {
-            if (_eventOptionsByName.TryGetValue(telemetryEvent.EventName, out var telemetryRouterEventOptions) is false)
-                return;
-
-            foreach (var writeDataAction in telemetryRouterEventOptions.EnumerationWriteDataActions())
-            {
-                ProcessWriteDataAction(writeDataAction, telemetryEvent.TelemetryInfos);
-            }
-        }
-
-        private void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction, TelemetryInfo[] telemetryInfos)
+        private void ProcessWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction,
+            TelemetryInfo[] telemetryInfos)
         {
             var telemetryWriters = writeDataAction.TelemetryWriterUniqueNames
                 .Select(TryGetTelemetryWriter)
@@ -61,7 +62,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
             var telemetryInfosToWrite = writeDataAction.IsStatic
                 ? _staticTelemetryInfoStorage.GetData(writeDataAction.TelemetryUniqueName).ToArray()
-                : telemetryInfos.Where(i => i.TelemetryUniqueName.Equals(writeDataAction.TelemetryUniqueName)).ToArray();
+                : telemetryInfos.Where(i => i.TelemetryUniqueName.Equals(writeDataAction.TelemetryUniqueName))
+                    .ToArray();
 
             foreach (var telemetryWriter in telemetryWriters)
                 telemetryWriter.Write(telemetryInfosToWrite, writeDataAction.IsStatic);

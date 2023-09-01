@@ -20,7 +20,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Writers
 
         public void Write(TelemetryInfo[] telemetryInfos, bool isStaticData)
         {
-            foreach (var telemetryInfo in telemetryInfos) 
+            foreach (var telemetryInfo in telemetryInfos)
                 Write(telemetryInfo);
         }
 

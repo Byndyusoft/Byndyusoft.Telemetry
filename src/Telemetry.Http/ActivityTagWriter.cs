@@ -37,7 +37,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
             if (activity is null)
                 return;
 
-            foreach (var telemetryInfo in telemetryInfos) 
+            foreach (var telemetryInfo in telemetryInfos)
                 Write(telemetryInfo, activity);
         }
 

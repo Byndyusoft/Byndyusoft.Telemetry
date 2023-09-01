@@ -42,10 +42,7 @@ builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
         .SetResourceBuilder(ResourceBuilder.CreateDefault()
             .AddService(serviceName))
         .AddAspNetCoreInstrumentation(
-            options =>
-            {
-                options.Filter = context => context.Request.Path.StartsWithSegments("/swagger") == false;
-            })
+            options => { options.Filter = context => context.Request.Path.StartsWithSegments("/swagger") == false; })
         .AddConsoleExporter()
         .AddOtlpExporter(builder.Configuration.GetSection("Jaeger").Bind);
 });

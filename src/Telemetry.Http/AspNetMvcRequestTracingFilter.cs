@@ -19,8 +19,8 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 {
     public class AspNetMvcRequestTracingFilter : IAsyncActionFilter
     {
-        private readonly ITelemetryRouter _telemetryRouter;
         private readonly AspNetMvcTracingOptions _options;
+        private readonly ITelemetryRouter _telemetryRouter;
 
         public AspNetMvcRequestTracingFilter(
             IOptions<AspNetMvcTracingOptions> options,
@@ -289,7 +289,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 
             return builder
                 .AddRequestTracing(configure);
-                //.AddResponseTracing(configure);
+            //.AddResponseTracing(configure);
         }
 
         /// <returns>The <see cref="IMvcCoreBuilder" />.</returns>
@@ -301,7 +301,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
 
             return builder
                 .AddRequestTracing(configure);
-                //.AddResponseTracing(configure);
+            //.AddResponseTracing(configure);
         }
 
         /// <returns>The <see cref="IMvcBuilder" />.</returns>
@@ -374,10 +374,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Http
                 services.Configure(configure);
             }
 
-            services.PostConfigure<MvcOptions>(options =>
-            {
-                options.Filters.Add<AspNetMvcRequestTracingFilter>();
-            });
+            services.PostConfigure<MvcOptions>(options => { options.Filters.Add<AspNetMvcRequestTracingFilter>(); });
         }
     }
 }

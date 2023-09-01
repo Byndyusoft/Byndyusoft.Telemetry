@@ -1,9 +1,6 @@
 using System;
-using Byndyusoft.AspNetCore.Mvc.Telemetry;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Definitions;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Http;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Options;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers;
@@ -54,33 +51,22 @@ builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 });
 
 // TODO Вынести в отдельный класс
-builder.Services.Configure<TelemetryRouterOptions>(o =>
-{
-    o.AddEvent(TelemetryHttpEventNames.Request, eventOptions => eventOptions
-        .WriteEventData(
-            HttpTelemetryUniqueNames.Request, 
-            TelemetryActivityWriterUniqueNames.Event,
+builder.Services.AddTelemetryRouter(telemetryRouterOptions => telemetryRouterOptions
+    .AddEvent(TelemetryHttpEventNames.Request, eventOptions => eventOptions
+        .WriteEventData(HttpTelemetryUniqueNames.Request)
+        .To(TelemetryActivityWriterUniqueNames.Event,
             TelemetryActivityWriterUniqueNames.Tag,
             TelemetryWriterUniqueNames.LogPropertyAccessor)
-        .WriteStaticData(
-            StaticTelemetryUniqueNames.BuildConfiguration,
-            TelemetryActivityWriterUniqueNames.Tag));
-    o.AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
-        .WriteStaticData(
-            StaticTelemetryUniqueNames.BuildConfiguration, 
-            TelemetryWriterUniqueNames.LogPropertyAccessor));
-    o.AddWriter<LogWriter>();
-    o.AddWriter<LogPropertyWriter>();
-    o.AddWriter<ActivityTagWriter>();
-    o.AddWriter<ActivityEventWriter>();
-    o.AddStaticTelemetryDataProvider(new BuildConfigurationStaticTelemetryDataProvider());
-});
-builder.Services.AddSingleton<LogWriter>();
-builder.Services.AddSingleton<LogPropertyWriter>();
-builder.Services.AddSingleton<ActivityTagWriter>();
-builder.Services.AddSingleton<ActivityEventWriter>();
-builder.Services.AddHostedService<InitializeTelemetryRouterHostedService>();
-builder.Services.AddSingleton<ITelemetryRouter, TelemetryRouter>();
+        .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
+        .To(TelemetryActivityWriterUniqueNames.Tag))
+    .AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
+        .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
+        .To(TelemetryWriterUniqueNames.LogPropertyAccessor))
+    .AddWriter<LogWriter>()
+    .AddWriter<LogPropertyWriter>()
+    .AddWriter<ActivityTagWriter>()
+    .AddWriter<ActivityEventWriter>()
+    .AddStaticTelemetryDataProvider(new BuildConfigurationStaticTelemetryDataProvider()));
 
 var app = builder.Build();
 

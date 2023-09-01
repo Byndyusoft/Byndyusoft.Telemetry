@@ -11,22 +11,25 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Options
         internal readonly List<IStaticTelemetryDataProvider> StaticTelemetryDataProviders = new();
         internal readonly List<Type> TelemetryWriterTypes = new();
 
-        public void AddStaticTelemetryDataProvider(IStaticTelemetryDataProvider telemetryDataProvider)
+        public TelemetryRouterOptions AddStaticTelemetryDataProvider(IStaticTelemetryDataProvider telemetryDataProvider)
         {
             StaticTelemetryDataProviders.Add(telemetryDataProvider);
+            return this;
         }
 
-        public void AddWriter<T>() where T : ITelemetryWriter
+        public TelemetryRouterOptions AddWriter<T>() where T : ITelemetryWriter
         {
             TelemetryWriterTypes.Add(typeof(T));
+            return this;
         }
 
-        public void AddEvent(string eventName, Action<TelemetryRouterEventOptions> configureOptions)
+        public TelemetryRouterOptions AddEvent(string eventName, Action<TelemetryRouterEventOptions> configureOptions)
         {
             var telemetryRouterEventOptions = new TelemetryRouterEventOptions(eventName);
             configureOptions.Invoke(telemetryRouterEventOptions);
 
             EventOptions.Add(telemetryRouterEventOptions);
+            return this;
         }
     }
 }

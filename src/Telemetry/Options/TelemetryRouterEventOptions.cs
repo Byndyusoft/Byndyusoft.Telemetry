@@ -19,26 +19,20 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Options
             return _writeDataActions.AsEnumerable();
         }
 
-        private void AddWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction)
+        public TelemetryRouterEventOptions AddWriteDataAction(TelemetryRouterEventWriteDataAction writeDataAction)
         {
             _writeDataActions.Add(writeDataAction);
-        }
-
-        // TODO: Consider using builder
-        public TelemetryRouterEventOptions WriteStaticData(string telemetryInfoName, params string[] telemetryWriterUniqueNames)
-        {
-            var writeDataAction =
-                new TelemetryRouterEventWriteDataAction(true, telemetryInfoName, telemetryWriterUniqueNames);
-            AddWriteDataAction(writeDataAction);
             return this;
         }
 
-        public TelemetryRouterEventOptions WriteEventData(string telemetryInfoName, params string[] telemetryWriterUniqueNames)
+        public TelemetryRouterEventWriteDataActionBuilder WriteStaticData(string telemetryInfoName)
         {
-            var writeDataAction =
-                new TelemetryRouterEventWriteDataAction(false, telemetryInfoName, telemetryWriterUniqueNames);
-            AddWriteDataAction(writeDataAction);
-            return this;
+            return new TelemetryRouterEventWriteDataActionBuilder(this, true, telemetryInfoName);
+        }
+
+        public TelemetryRouterEventWriteDataActionBuilder WriteEventData(string telemetryInfoName)
+        {
+            return new TelemetryRouterEventWriteDataActionBuilder(this, false, telemetryInfoName);
         }
     }
 }

@@ -95,7 +95,7 @@ builder.Services
 ## Интеграция с OpenTelemetry Tracing
 Роутер телеметрии не является инструментацией в OpenTelemetry, и не должен ее заменять. Он должен ее дополнять.
 
-Например, в библиотеке RabbitMq есть [инструментация](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq.OpenTelemetry). Ему не нужно знать о TelemetryRouter, это его кухня.
+Например, в библиотеке RabbitMq есть [инструментация](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq.OpenTelemetry). Ему не нужно знать о [ITelemetryRouter](src/Telemetry/ITelemetryRouter.cs), это его кухня.
 Нужно будет добавить точки расширения в самой библиотеке [RabbitMq](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq), чтобы в другой библиотеке (например, в этой) можно добавлять триггеры событий о получении сообщения и заврешении обработки с отправкой данных в сам роутер.
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)

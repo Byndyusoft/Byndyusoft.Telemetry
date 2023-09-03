@@ -1,29 +1,66 @@
-# Template Information (Delete this header before publishing package)
+# Концепция
+В этой библиотеке реализована концепция передачи телеметрии определенных данных к определенным "писателям" этих данных. 
+Под писателями подразумевается конкретные секции вывода телеметрии, которые впоследствии будут использоваться человеком для анализа этих данных.
 
-## .NET Nuget publishing template
-This is a template repository with github actions for .NET nuget packages creation and publishing
+## Писатели
+Нас, прежде всего, интересуют следующие виды писателей:
+- Свойства логов - это поля json-записей в журнале логов, которые описывают контекст текущего события (например, запроса http, или сервиса в целом). Они нужны для фильтрации в ElasticSearch.
+- Логи - это строчка записи в журнал логов, описывающая событие, которое сейчас произошло.
+- Тэги спана трассы - это поля текущего спана в трассе, которые описывают контекст текущего события (например, запроса http, или сервиса в целом). Они нужны для фильтрации в Jaeger.
+- События спана трассы - это выпуск события в текущий спан в трассе. Оно описывает событие, которое сейчас произошло.
 
-## How to use:
-- Rename ExampleSolution to your solution name (ExampleSolution => MyPackageSolution)
-- Delete project and add your projects or rename existing projects(ExampleProject => MyPackage). If your IDE does not support folders renaming, you also need to rename folders manually. 
-- Change properties in Directory.Build.props file according to your needs (version, package tags, repository url)
-- Fix **dotnet-version** in .github/workflows/\*.yml
+Можно использователей писателей как для трас из OpenTelemetry Tracing, так и для OpenTracing. Ограничений в этой концепции нет.
 
-## How to publish pre-release to nuget.org:
+## Данные телеметрии
+Один элемент телеметрии содержит 2 поля: ключ и значение. Он описан в классе [TelemetryInfoItem](src/Telemetry/Data/TelemetryInfoItem.cs).
 
-Mark *This is a pre-release* checkbox when you create a release.
+Эти данные объеденияются в группу данных, которая называется [TelemetryInfo](src/Telemetry/Data/TelemetryInfo.cs). 
+Группа содержит некое уникальное строковое обозначение, которое впоследствии будет использоваться для роутинга данных писателям.
+Также в ней находится описательное поле Message, оно необходимо для писателей логов и событий спана трассы.
 
-![image](https://user-images.githubusercontent.com/38452272/184600138-abc74f6e-3c7e-4c0a-ad51-426473f02917.png)
+### Данные телеметрии события
+При возникновении того или иного события (например, http request) возникают данные, которые нужно куда-то отправить. Они отправляются в виде событий телеметрии [TelemetryEvent](src/Telemetry/Data/TelemetryEvent.cs) через метод *ProcessTelemetryEvent* в [ITelemetryRouter](src/Telemetry/ITelemetryRouter.cs).
 
-The package version will be *<proj_version>-tags-<tag_name>* where *proj_version* is retrieved from .csproj or Directory.Build.props file.
+Событие телеметрии  содержит уникальное имя *EventName*, которое обозначает момент возникновения этого события. Оно используется для роутинга данных.
 
-## Publishing README on Nuget 
-If you want to publish README on Nuget add this in package csproj file
-``` xml
-<ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
-</ItemGroup>
+### Статические данные телеметрии, или Данные сервиса
+При старте приложения можно собрать телеметрию о самом сервисе. Например:
+- Версия сервиса.
+- Окружение, в котором запущен сервис.
+
+Эти данные называются статическими, и их сбор осуществляется с помощью реализации интерфейса [IStaticTelemetryDataProvider](src/Telemetry/Providers/Interface/IStaticTelemetryDataProvider.cs).
+Статические данные собираются при инициализации роутера телеметрии. Она происходит перед стартом сервисе в [InitializeTelemetryRouterHostedService](src/Telemetry/HostedServices/InitializeTelemetryRouterHostedService.cs).
+Их можно отправить писателям при любом возникновении события.
+
+Существует специальное событие, которое можно вызвать для отправки статических данных сразу после инициализации роутера телеметрии. Оно называется *TelemetryRouter.Initialization* и описано в классе [DefaultTelemetryEventNames](src/Telemetry/Definitions/DefaultTelemetryEventNames.cs).
+
+## Особенности обогащения логов
+Т.к. свойства логов обогащаются пассивно (другими словами, нельзя явно что-то обогатить в контексте возникновения события), то данные телеметрии для их обогащения отправлются в класс [LogPropertyTelemetryDataAccessor](src/Telemetry/Logging/LogPropertyTelemetryDataAccessor.cs) через писателя [LogPropertyWriter](src/Telemetry/Writers/LogPropertyWriter.cs). 
+Он является статическим, и хранит в себе как статические данные, так и данные события, хранящиеся внутри асинхронного контекста с помощью [AsyncLocal<T>](https://learn.microsoft.com/en-us/dotnet/api/system.threading.asynclocal-1).
+
+Пример обогатителя для логгера Serilog описан в классе [TelemetryLogEventEnricher](src/Telemetry.Serilog/TelemetryLogEventEnricher.cs):
+```csharp
+public class TelemetryLogEventEnricher : ILogEventEnricher
+{
+	public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
+	{
+		foreach (var telemetryInfo in LogPropertyTelemetryDataAccessor.GetTelemetryData())
+			Enrich(logEvent, propertyFactory, telemetryInfo);
+	}
+
+	private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, TelemetryInfo telemetryInfo)
+	{
+		foreach (var telemetryInfoItem in telemetryInfo)
+		{
+			logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryInfoItem.Key,
+				telemetryInfoItem.Value));
+		}
+	}
+}
 ```
+
+## Конфигурирование роутинга
+
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

@@ -60,7 +60,40 @@ public class TelemetryLogEventEnricher : ILogEventEnricher
 ```
 
 ## Конфигурирование роутинга
+Пример конфигурации роутера из файла [Program.cs](example/TestApi/Program.cs):
 
+```csharp
+builder.Services.AddTelemetryRouter(telemetryRouterOptions => telemetryRouterOptions
+    .AddStaticTelemetryDataProvider(new BuildConfigurationStaticTelemetryDataProvider())
+    .AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
+        .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
+        .To(TelemetryWriterUniqueNames.LogPropertyAccessor))
+    .AddEvent(TelemetryHttpEventNames.Request, eventOptions => eventOptions
+        .WriteEventData(HttpTelemetryUniqueNames.Request)
+        .To(TelemetryActivityWriterUniqueNames.Event,
+            TelemetryActivityWriterUniqueNames.Tag,
+            TelemetryWriterUniqueNames.LogPropertyAccessor)
+        .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
+        .To(TelemetryActivityWriterUniqueNames.Tag)));
+
+builder.Services
+    .AddTelemetryWriter<LogWriter>()
+    .AddTelemetryWriter<LogPropertyWriter>()
+    .AddTelemetryWriter<ActivityTagWriter>()
+    .AddTelemetryWriter<ActivityEventWriter>();
+```
+
+Здесь описывается следующее:
+1. Добавляем провайдер статических данных сервиса о конфигурации билда [BuildConfigurationStaticTelemetryDataProvider](src/Telemetry/Providers/BuildConfigurationStaticTelemetryDataProvider.cs).
+2. После инициализации роутера телеметрии обогащаем свойства всех последующих логов информацией о конфигурации билда.
+3. На старте запроса http записываем данные телеметрии с наименованием *HttpTelemetryUniqueNames.Request* в тэги и события спана трассы, а также все логи в рамках этого запроса будут содержать эти поля.
+4. На старте запроса http записываем данные о конфигурации билда в тэги трассы.
+
+## Интеграция с OpenTelemetry Tracing
+Роутер телеметрии не является инструментацией в OpenTelemetry, и не должен ее заменять. Он должен ее дополнять.
+
+Например, в библиотеке RabbitMq есть [инструментация](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq.OpenTelemetry). Ему не нужно знать о TelemetryRouter, это его кухня.
+Нужно будет добавить точки расширения в самой библиотеке [RabbitMq](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq), чтобы можно добавлять триггеры событий о получении сообщения и заврешении обработки с отправкой данных в сам роутер.
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

@@ -1,5 +1,5 @@
 # Концепция
-В этой библиотеке реализована концепция передачи телеметрии определенных данных к определенным "писателям" этих данных. 
+В этой библиотеке реализована концепция роутинга телеметрии определенных данных к определенным "писателям" этих данных. 
 Под писателями подразумевается конкретные секции вывода телеметрии, которые впоследствии будут использоваться человеком для анализа этих данных.
 
 ## Писатели
@@ -11,12 +11,14 @@
 
 Можно использователей писателей как для трас из OpenTelemetry Tracing, так и для OpenTracing. Ограничений в этой концепции нет.
 
+Писатели должны реализовывать интерфейс [ITelemetryWriter](src/Telemetry/Writers/Interfaces/ITelemetryWriter.cs). У каждого писателя должно быть свое уникальное имя.
+
 ## Данные телеметрии
-Один элемент телеметрии содержит 2 поля: ключ и значение. Он описан в классе [TelemetryInfoItem](src/Telemetry/Data/TelemetryInfoItem.cs).
+Одна секция данных телеметрии содержит 2 поля: ключ и значение. Он описан в классе [TelemetryInfoItem](src/Telemetry/Data/TelemetryInfoItem.cs).
 
 Эти данные объеденияются в группу данных, которая называется [TelemetryInfo](src/Telemetry/Data/TelemetryInfo.cs). 
 Группа содержит некое уникальное строковое обозначение, которое впоследствии будет использоваться для роутинга данных писателям.
-Также в ней находится описательное поле Message, оно необходимо для писателей логов и событий спана трассы.
+Также в ней находится описательное поле *Message*, оно необходимо для писателей логов и событий спана трассы.
 
 ### Данные телеметрии события
 При возникновении того или иного события (например, http request) возникают данные, которые нужно куда-то отправить. Они отправляются в виде событий телеметрии [TelemetryEvent](src/Telemetry/Data/TelemetryEvent.cs) через метод *ProcessTelemetryEvent* в [ITelemetryRouter](src/Telemetry/ITelemetryRouter.cs).
@@ -30,12 +32,12 @@
 
 Эти данные называются статическими, и их сбор осуществляется с помощью реализации интерфейса [IStaticTelemetryDataProvider](src/Telemetry/Providers/Interface/IStaticTelemetryDataProvider.cs).
 Статические данные собираются при инициализации роутера телеметрии. Она происходит перед стартом сервисе в [InitializeTelemetryRouterHostedService](src/Telemetry/HostedServices/InitializeTelemetryRouterHostedService.cs).
-Их можно отправить писателям при любом возникновении события.
+Данные сервиса можно отправить писателям при любом возникновении события.
 
 Существует специальное событие, которое можно вызвать для отправки статических данных сразу после инициализации роутера телеметрии. Оно называется *TelemetryRouter.Initialization* и описано в классе [DefaultTelemetryEventNames](src/Telemetry/Definitions/DefaultTelemetryEventNames.cs).
 
 ## Особенности обогащения логов
-Т.к. свойства логов обогащаются пассивно (другими словами, нельзя явно что-то обогатить в контексте возникновения события), то данные телеметрии для их обогащения отправлются в класс [LogPropertyTelemetryDataAccessor](src/Telemetry/Logging/LogPropertyTelemetryDataAccessor.cs) через писателя [LogPropertyWriter](src/Telemetry/Writers/LogPropertyWriter.cs). 
+Т.к. свойства логов обогащаются пассивно (другими словами, нельзя что-то вызвать, чтобы обогатить данными в рамках возникновения события), то данные телеметрии для их обогащения отправлются в класс [LogPropertyTelemetryDataAccessor](src/Telemetry/Logging/LogPropertyTelemetryDataAccessor.cs) через писателя [LogPropertyWriter](src/Telemetry/Writers/LogPropertyWriter.cs). 
 Он является статическим, и хранит в себе как статические данные, так и данные события, хранящиеся внутри асинхронного контекста с помощью [AsyncLocal<T>](https://learn.microsoft.com/en-us/dotnet/api/system.threading.asynclocal-1).
 
 Пример обогатителя для логгера Serilog описан в классе [TelemetryLogEventEnricher](src/Telemetry.Serilog/TelemetryLogEventEnricher.cs):
@@ -88,12 +90,13 @@ builder.Services
 2. После инициализации роутера телеметрии обогащаем свойства всех последующих логов информацией о конфигурации билда.
 3. На старте запроса http записываем данные телеметрии с наименованием *HttpTelemetryUniqueNames.Request* в тэги и события спана трассы, а также все логи в рамках этого запроса будут содержать эти поля.
 4. На старте запроса http записываем данные о конфигурации билда в тэги трассы.
+5. Регистрируем 4-х писателей.
 
 ## Интеграция с OpenTelemetry Tracing
 Роутер телеметрии не является инструментацией в OpenTelemetry, и не должен ее заменять. Он должен ее дополнять.
 
 Например, в библиотеке RabbitMq есть [инструментация](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq.OpenTelemetry). Ему не нужно знать о TelemetryRouter, это его кухня.
-Нужно будет добавить точки расширения в самой библиотеке [RabbitMq](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq), чтобы можно добавлять триггеры событий о получении сообщения и заврешении обработки с отправкой данных в сам роутер.
+Нужно будет добавить точки расширения в самой библиотеке [RabbitMq](https://github.com/Byndyusoft/Byndyusoft.Net.RabbitMq/tree/master/src/Byndyusoft.Messaging.RabbitMq), чтобы в другой библиотеке (например, в этой) можно добавлять триггеры событий о получении сообщения и заврешении обработки с отправкой данных в сам роутер.
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

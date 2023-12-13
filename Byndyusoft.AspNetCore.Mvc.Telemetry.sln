@@ -30,7 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{BC20
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApi", "example\TestApi\TestApi.csproj", "{F1A3F8B1-95BD-44B3-BEDF-657E7C4FB633}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telemetry.Serilog", "src\Telemetry.Serilog\Telemetry.Serilog.csproj", "{857DCA57-AA80-454A-99CA-197453C951E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telemetry.Serilog", "src\Telemetry.Serilog\Telemetry.Serilog.csproj", "{857DCA57-AA80-454A-99CA-197453C951E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telemetry.Logging", "src\Telemetry.Logging\Telemetry.Logging.csproj", "{4B72B8E0-F8DE-4988-8CAE-59B61F7B7B2E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +56,10 @@ Global
 		{857DCA57-AA80-454A-99CA-197453C951E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{857DCA57-AA80-454A-99CA-197453C951E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{857DCA57-AA80-454A-99CA-197453C951E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B72B8E0-F8DE-4988-8CAE-59B61F7B7B2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B72B8E0-F8DE-4988-8CAE-59B61F7B7B2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B72B8E0-F8DE-4988-8CAE-59B61F7B7B2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B72B8E0-F8DE-4988-8CAE-59B61F7B7B2E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{2EDCDEEB-2C0F-4062-8EE6-3097E2234E2E} = {F298540A-82E2-4421-9525-BBAC087AE77C}
 		{F1A3F8B1-95BD-44B3-BEDF-657E7C4FB633} = {BC20F6E8-5565-4727-AB91-047CD8E6E9B8}
 		{857DCA57-AA80-454A-99CA-197453C951E0} = {F298540A-82E2-4421-9525-BBAC087AE77C}
+		{4B72B8E0-F8DE-4988-8CAE-59B61F7B7B2E} = {F298540A-82E2-4421-9525-BBAC087AE77C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5A3EF0C-96D2-472C-A367-AB34B065DC56}

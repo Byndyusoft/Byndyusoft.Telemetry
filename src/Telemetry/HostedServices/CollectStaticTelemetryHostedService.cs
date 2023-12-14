@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
 using Microsoft.Extensions.Hosting;
@@ -9,9 +11,9 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices
     {
         private readonly IStaticTelemetryItemProvider[] _providers;
 
-        public CollectStaticTelemetryHostedService(IStaticTelemetryItemProvider[] providers)
+        public CollectStaticTelemetryHostedService(IEnumerable<IStaticTelemetryItemProvider> providers)
         {
-            _providers = providers;
+            _providers = providers.ToArray();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

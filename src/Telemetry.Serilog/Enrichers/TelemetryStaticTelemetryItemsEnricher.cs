@@ -1,5 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Logging;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.Enrichers
@@ -8,7 +7,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.Enrichers
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            foreach (var telemetryItem in LogPropertyDataAccessor.GetTelemetryItems())
+            foreach (var telemetryItem in StaticTelemetryItemsCollector.GetTelemetryItems())
                 Enrich(logEvent, propertyFactory, telemetryItem);
         }
 

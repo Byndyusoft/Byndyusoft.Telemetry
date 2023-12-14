@@ -1,5 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
+﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -20,9 +19,11 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
-        public StaticTelemetryItemBuilder WithBuildConfiguration()
+        public StaticTelemetryItemBuilder WithProvider<T>(T provider)
+        where T : IStaticTelemetryItemProvider
         {
-            return WithProvider<BuildConfigurationStaticTelemetryItemProvider>();
+            _services.AddSingleton<IStaticTelemetryItemProvider>(provider);
+            return this;
         }
     }
 }

@@ -31,21 +31,24 @@ builder.Services.AddMvcCore();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var serviceName = builder.Configuration.GetValue<string>("Jaeger:ServiceName");
 builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 {
-    var serviceName = builder.Configuration.GetValue<string>("Jaeger:ServiceName");
     tracerProviderBuilder
-        .SetResourceBuilder(ResourceBuilder.CreateDefault()
-            .AddService(serviceName))
-        .AddAspNetCoreInstrumentation(
-            options => { options.Filter = context => context.Request.Path.StartsWithSegments("/swagger") == false; })
+        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(serviceName))
+        .AddAspNetCoreInstrumentation(options =>
+        {
+            options.Filter = context => context.Request.Path.StartsWithSegments("/swagger") == false;
+        })
         .AddConsoleExporter()
         .AddOtlpExporter(builder.Configuration.GetSection("Jaeger").Bind);
 });
 
-// TODO Добавить
 builder.Services.AddStaticTelemetryItemCollector()
-    .WithBuildConfiguration();
+    .WithBuildConfiguration()
+    .WithAspNetCoreEnvironment()
+    .WithServiceName(serviceName)
+    .WithApplicationVersion("0.0.0.1");
 
 var app = builder.Build();
 

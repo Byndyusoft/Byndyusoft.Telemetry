@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Consts;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
 
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
@@ -10,7 +11,6 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
         public TelemetryItem[] GetTelemetryItems()
         {
             const string buildEnvironmentKeyPrefix = "BUILD_";
-            const string telemetryKeyPrefix = "build.";
             var telemetryItems = new List<TelemetryItem>();
 
             var variables = Environment.GetEnvironmentVariables();
@@ -27,7 +27,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
                 if (property is not null && property.StartsWith(buildEnvironmentKeyPrefix))
                 {
                     var name = property.Remove(0, buildEnvironmentKeyPrefix.Length);
-                    name = $"{telemetryKeyPrefix}{name.ToLowerInvariant()}";
+                    name = $"{TelemetryItemNames.BuildPrefix}.{name.ToLowerInvariant()}";
                     telemetryItems.Add(new TelemetryItem(name, value));
                 }
             }

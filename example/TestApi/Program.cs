@@ -1,5 +1,4 @@
 using System;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Configuration;
 using Serilog.Formatting.Json;
 
 Environment.SetEnvironmentVariable("BUILD_COMMIT_HASH", "asdfdasf");
@@ -17,7 +17,9 @@ var builder = WebApplication
 
 builder.Host.UseSerilog((_, loggerConfiguration) =>
 {
-    loggerConfiguration.Enrich.With<TelemetryLogEventEnricher>();
+    loggerConfiguration
+        .Enrich.WithPropertyDataAccessor()
+        .Enrich.WithStaticTelemetryItems();
     loggerConfiguration.WriteTo.Console(new JsonFormatter());
 });
 

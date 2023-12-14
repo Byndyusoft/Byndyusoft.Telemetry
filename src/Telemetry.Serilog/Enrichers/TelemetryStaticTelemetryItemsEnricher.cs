@@ -2,9 +2,9 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog
+namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.Enrichers
 {
-    public class TelemetryLogEventEnricher : ILogEventEnricher
+    public class TelemetryStaticTelemetryItemsEnricher : ILogEventEnricher
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {

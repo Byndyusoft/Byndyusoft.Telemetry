@@ -6,7 +6,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 {
     public class StaticTelemetryItemsCollector
     {
-        private static readonly List<TelemetryItem> TelemetryItems = new List<TelemetryItem>();
+        private static readonly List<TelemetryItem> TelemetryItems = new();
 
         public static IEnumerable<TelemetryItem> GetTelemetryItems() => TelemetryItems.AsEnumerable();
 

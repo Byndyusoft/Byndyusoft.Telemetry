@@ -42,6 +42,8 @@ builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
 });
 
 // TODO Добавить
+builder.Services.AddStaticTelemetryItemCollector()
+    .WithBuildConfiguration();
 
 var app = builder.Build();
 

@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Telemetry\Telemetry.csproj" />
+    <ProjectReference Include="..\Telemetry.Logging\Telemetry.Logging.csproj" />
   </ItemGroup>
 
 </Project>

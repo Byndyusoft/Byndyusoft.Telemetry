@@ -1,5 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Data;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Logging;
+﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Logging;
 using Serilog.Core;
 using Serilog.Events;
 
@@ -9,17 +8,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            foreach (var telemetryInfo in LogPropertyTelemetryDataAccessor.GetTelemetryData())
-                Enrich(logEvent, propertyFactory, telemetryInfo);
+            foreach (var propertyDataItem in LogPropertyDataAccessor.GetPropertyDataItems())
+                Enrich(logEvent, propertyFactory, propertyDataItem);
         }
 
-        private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, TelemetryInfo telemetryInfo)
+        private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, PropertyDataItem propertyDataItem)
         {
-            foreach (var telemetryInfoItem in telemetryInfo)
-            {
-                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryInfoItem.Key,
-                    telemetryInfoItem.Value));
-            }
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(propertyDataItem.Name.Replace('.', '_'), propertyDataItem.Value));
         }
     }
 }

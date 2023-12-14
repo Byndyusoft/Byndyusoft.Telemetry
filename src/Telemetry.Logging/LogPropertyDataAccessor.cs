@@ -9,13 +9,24 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Logging
     {
         private static readonly AsyncLocal<EventDataHolder> EventDataCurrent = new();
 
-        internal static void AddTelemetryInfos(PropertyDataItem[] propertyDataItems)
+        public static void AddPropertyDataItem(string name, object? value)
+        {
+            AddPropertyDataItem(new PropertyDataItem(name, value));
+        }
+
+        public static void AddPropertyDataItem(PropertyDataItem propertyDataItem)
+        {
+            EventDataCurrent.Value ??= new EventDataHolder();
+            EventDataCurrent.Value.EventData.Add(propertyDataItem);
+        }
+
+        public static void AddPropertyDataItems(PropertyDataItem[] propertyDataItems)
         {
             EventDataCurrent.Value ??= new EventDataHolder();
             EventDataCurrent.Value.EventData.AddRange(propertyDataItems);
         }
 
-        public static IEnumerable<PropertyDataItem> GetTelemetryData()
+        public static IEnumerable<PropertyDataItem> GetPropertyDataItems()
         {
             if (EventDataCurrent.Value is null)
                 return Array.Empty<PropertyDataItem>();

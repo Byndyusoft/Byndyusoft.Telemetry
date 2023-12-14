@@ -1,12 +1,12 @@
-﻿namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Logging
+﻿namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 {
-    public class PropertyDataItem
+    public class TelemetryItem
     {
         public string Name { get; }
 
         public object? Value { get; }
 
-        public PropertyDataItem(string name, object? value)
+        public TelemetryItem(string name, object? value)
         {
             Name = name;
             Value = value;

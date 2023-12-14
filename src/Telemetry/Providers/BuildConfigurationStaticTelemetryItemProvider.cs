@@ -1,21 +1,17 @@
 ﻿using System;
 using System.Collections;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Data;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Definitions;
+using System.Collections.Generic;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
 
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
 {
-    public class BuildConfigurationStaticTelemetryDataProvider : IStaticTelemetryDataProvider
+    public class BuildConfigurationStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {
-        public TelemetryInfo[] GetTelemetryData()
+        public TelemetryItem[] GetTelemetryItems()
         {
             const string buildEnvironmentKeyPrefix = "BUILD_";
             const string telemetryKeyPrefix = "build.";
-
-            var telemetryInfo = new TelemetryInfo(
-                StaticTelemetryUniqueNames.BuildConfiguration,
-                "Build Configuration");
+            var telemetryItems = new List<TelemetryItem>();
 
             var variables = Environment.GetEnvironmentVariables();
             foreach (DictionaryEntry variable in variables)
@@ -30,13 +26,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
                 var property = variable.Key.ToString();
                 if (property is not null && property.StartsWith(buildEnvironmentKeyPrefix))
                 {
-                    var key = property.Remove(0, buildEnvironmentKeyPrefix.Length);
-                    key = $"{telemetryKeyPrefix}{key.ToLowerInvariant()}";
-                    telemetryInfo.Add(key, value);
+                    var name = property.Remove(0, buildEnvironmentKeyPrefix.Length);
+                    name = $"{telemetryKeyPrefix}{name.ToLowerInvariant()}";
+                    telemetryItems.Add(new TelemetryItem(name, value));
                 }
             }
 
-            return new[] { telemetryInfo };
+            return telemetryItems.ToArray();
         }
     }
 }

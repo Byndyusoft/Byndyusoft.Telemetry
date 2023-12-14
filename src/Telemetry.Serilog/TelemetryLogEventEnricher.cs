@@ -8,13 +8,13 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            foreach (var propertyDataItem in LogPropertyDataAccessor.GetPropertyDataItems())
-                Enrich(logEvent, propertyFactory, propertyDataItem);
+            foreach (var telemetryItem in LogPropertyDataAccessor.GetTelemetryItems())
+                Enrich(logEvent, propertyFactory, telemetryItem);
         }
 
-        private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, PropertyDataItem propertyDataItem)
+        private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, TelemetryItem telemetryItem)
         {
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(propertyDataItem.Name.Replace('.', '_'), propertyDataItem.Value));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryItem.Name.Replace('.', '_'), telemetryItem.Value));
         }
     }
 }

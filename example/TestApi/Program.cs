@@ -1,9 +1,5 @@
 using System;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Definitions;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Http;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Writers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,9 +24,7 @@ builder.Host.UseSerilog((_, loggerConfiguration) =>
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services
-    .AddMvcCore()
-    .AddTracing();
+builder.Services.AddMvcCore();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -47,25 +41,7 @@ builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
         .AddOtlpExporter(builder.Configuration.GetSection("Jaeger").Bind);
 });
 
-// TODO Вынести в отдельный класс
-builder.Services.AddTelemetryRouter(telemetryRouterOptions => telemetryRouterOptions
-    .AddEvent(TelemetryHttpEventNames.Request, eventOptions => eventOptions
-        .WriteEventData(HttpTelemetryUniqueNames.Request)
-        .To(TelemetryActivityWriterUniqueNames.Event,
-            TelemetryActivityWriterUniqueNames.Tag,
-            TelemetryWriterUniqueNames.LogPropertyAccessor)
-        .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
-        .To(TelemetryActivityWriterUniqueNames.Tag))
-    .AddEvent(DefaultTelemetryEventNames.Initialization, eventOptions => eventOptions
-        .WriteStaticData(StaticTelemetryUniqueNames.BuildConfiguration)
-        .To(TelemetryWriterUniqueNames.LogPropertyAccessor))
-    .AddStaticTelemetryDataProvider(new BuildConfigurationStaticTelemetryDataProvider()));
-
-builder.Services
-    .AddTelemetryWriter<LogWriter>()
-    .AddTelemetryWriter<LogPropertyWriter>()
-    .AddTelemetryWriter<ActivityTagWriter>()
-    .AddTelemetryWriter<ActivityEventWriter>();
+// TODO Добавить
 
 var app = builder.Build();
 

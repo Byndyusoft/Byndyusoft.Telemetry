@@ -9,27 +9,27 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Logging
     {
         private static readonly AsyncLocal<EventDataHolder> EventDataCurrent = new();
 
-        public static void AddPropertyDataItem(string name, object? value)
+        public static void AddTelemetryItem(string name, object? value)
         {
-            AddPropertyDataItem(new PropertyDataItem(name, value));
+            AddTelemetryItem(new TelemetryItem(name, value));
         }
 
-        public static void AddPropertyDataItem(PropertyDataItem propertyDataItem)
-        {
-            EventDataCurrent.Value ??= new EventDataHolder();
-            EventDataCurrent.Value.EventData.Add(propertyDataItem);
-        }
-
-        public static void AddPropertyDataItems(PropertyDataItem[] propertyDataItems)
+        public static void AddTelemetryItem(TelemetryItem telemetryItem)
         {
             EventDataCurrent.Value ??= new EventDataHolder();
-            EventDataCurrent.Value.EventData.AddRange(propertyDataItems);
+            EventDataCurrent.Value.EventData.Add(telemetryItem);
         }
 
-        public static IEnumerable<PropertyDataItem> GetPropertyDataItems()
+        public static void AddTelemetryItems(TelemetryItem[] telemetryItems)
+        {
+            EventDataCurrent.Value ??= new EventDataHolder();
+            EventDataCurrent.Value.EventData.AddRange(telemetryItems);
+        }
+
+        public static IEnumerable<TelemetryItem> GetTelemetryItems()
         {
             if (EventDataCurrent.Value is null)
-                return Array.Empty<PropertyDataItem>();
+                return Array.Empty<TelemetryItem>();
 
             return EventDataCurrent.Value.EventData.AsEnumerable();
         }
@@ -37,7 +37,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Logging
         // ReSharper disable once ClassNeverInstantiated.Local
         private class EventDataHolder
         {
-            public readonly List<PropertyDataItem> EventData = new();
+            public readonly List<TelemetryItem> EventData = new();
         }
     }
 }

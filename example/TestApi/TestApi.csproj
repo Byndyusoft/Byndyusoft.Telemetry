@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Telemetry.OpenTelemetry\Telemetry.OpenTelemetry.csproj" />
     <ProjectReference Include="..\..\src\Telemetry.Serilog\Telemetry.Serilog.csproj" />
     <ProjectReference Include="..\..\src\Telemetry\Telemetry.csproj" />
   </ItemGroup>

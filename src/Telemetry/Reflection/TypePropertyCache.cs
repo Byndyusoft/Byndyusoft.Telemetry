@@ -16,7 +16,7 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Reflection
             Type = type;
             _properties = type
                 .GetProperties()
-                .Where(i => CustomAttributeExtensions.GetCustomAttribute<TelemetryItemAttribute>((MemberInfo)i) != null && i.GetMethod != null)
+                .Where(i => i.GetCustomAttribute<TelemetryItemAttribute>() != null && i.GetMethod != null)
                 .ToArray();
         }
 

@@ -6,22 +6,17 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 {
     public class ObjectTelemetryItemsCollector
     {
-        public TelemetryItem[] Collect(string parameterName, object? value, string namePrefix = "")
+        public TelemetryItem[] Collect(string parameterName, object? value)
         {
-            if (string.IsNullOrEmpty(namePrefix))
-                namePrefix = "";
-            else if (namePrefix.EndsWith(".") == false)
-                namePrefix += '.';
-
             if (value == null)
                 return Array.Empty<TelemetryItem>();
 
             var type = value.GetType();
             if (IsNotObject(type))
-                return CollectNotObjectTelemetryValues(parameterName, value, namePrefix);
+                return CollectNotObjectTelemetryValues(parameterName, value);
 
             var propertyItems = TypePropertyCache.GetPropertyItems(type, value);
-            return propertyItems.Select(i => new TelemetryItem(namePrefix + i.PropertyName, i.Value)).ToArray();
+            return propertyItems.Select(i => new TelemetryItem(i.PropertyName, i.Value)).ToArray();
         }
 
         private bool IsNotObject(Type type)
@@ -29,10 +24,10 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
             return type.IsPrimitive || type == typeof(string);
         }
 
-        private TelemetryItem[] CollectNotObjectTelemetryValues(string parameterName, object? value, string namePrefix)
+        private TelemetryItem[] CollectNotObjectTelemetryValues(string parameterName, object? value)
         {
             if (parameterName.EndsWith("id", StringComparison.InvariantCultureIgnoreCase))
-                return new[] { new TelemetryItem(namePrefix + parameterName, value) };
+                return new[] { new TelemetryItem(parameterName, value) };
 
             return Array.Empty<TelemetryItem>();
         }

@@ -3,7 +3,7 @@
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class LogAsTagAttribute : Attribute
+    public class TelemetryItemAttribute : Attribute
     {
     }
 }

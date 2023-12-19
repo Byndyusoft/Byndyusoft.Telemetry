@@ -6,4 +6,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Telemetry.Abstraction\Telemetry.Abstraction.csproj" />
+  </ItemGroup>
 </Project>

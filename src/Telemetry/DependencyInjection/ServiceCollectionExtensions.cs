@@ -1,4 +1,5 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices;
+﻿using Byndyusoft.AspNetCore.Mvc.Telemetry;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -9,6 +10,11 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddHostedService<CollectStaticTelemetryHostedService>();
             return new StaticTelemetryItemBuilder(services);
+        }
+
+        public static IServiceCollection AddObjectTelemetryItemCollector(this IServiceCollection services)
+        {
+            return services.AddSingleton<ObjectTelemetryItemsCollector>();
         }
     }
 }

@@ -21,6 +21,10 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry
 
         private bool IsNotObject(Type type)
         {
+            var underlyingNullableType = Nullable.GetUnderlyingType(type);
+            if (underlyingNullableType is not null)
+                type = underlyingNullableType;
+
             return type.IsPrimitive || type == typeof(string);
         }
 

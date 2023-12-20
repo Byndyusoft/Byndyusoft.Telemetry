@@ -1,5 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Logging;
-using Serilog.Core;
+﻿using Serilog.Core;
 using Serilog.Events;
 
 namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.Enrichers

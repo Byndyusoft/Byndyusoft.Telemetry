@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Logging
+namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog
 {
     public class LogPropertyDataAccessor
     {

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Byndyusoft.AspNetCore.Mvc.Telemetry;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Logging;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 

@@ -1,6 +1,6 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Byndyusoft.AspNetCore.Mvc.Telemetry [![Nuget](https://img.shields.io/nuget/v/ExampleProject.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry/)
+# Byndyusoft.AspNetCore.Mvc.Telemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry/)
 
 This package provides *TelemetryItem* type that is used for logging and tracing purposes. It has only two properties:
  - *Name* represents activity tag key or log object property name.
@@ -11,14 +11,14 @@ This package also provides static and object telemetry item collector.
 ## Installing
 
 ```shell
-dotnet add package ExampleProject
+dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry
 ```
 
 ## Usage
 
 ### Static telemetry item collector
 
-To use static telemetry item collector you have to register data provider that implements *IStaticTelemetryItemProvider* interface.
+To use static telemetry item collector you have to register it with all data providers that implement *IStaticTelemetryItemProvider* interface.
 
 There are four standard providers that are presented in example below.
 
@@ -31,7 +31,7 @@ builder.Services.AddStaticTelemetryItemCollector()
 ```
 
 
-Build configuration provider collects environment variables which name has "BUILD_" prefix.
+Build configuration provider collects environment variables with names that have **BUILD_** prefix.
 ASP NET Core environment configuration provides **ASPNETCORE_ENVIRONMENT** environment value.
 Service name and application version providers provide service name and application version respectively =)
 
@@ -48,22 +48,105 @@ This class should be used by different instrumentation tools such as:
 - RabbitMq consumers.
 - Kafka consumers.
 
-# ExampleProject.SecondPackage [![Nuget](https://img.shields.io/nuget/v/ExampleProject.SecondPackage.svg)](https://www.nuget.org/packages/ExampleProject.SecondPackage/)[![Downloads](https://img.shields.io/nuget/dt/ExampleProject.SecondPackage.svg)](https://www.nuget.org/packages/ExampleProject.SecondPackage/)
+# Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction/)
 
-Package description
+This class provides *TelemetryItemAttribute* attribute that is used by *ObjectTelemetryItemsCollector* described above.
 
 ## Installing
 
 ```shell
-dotnet add package ExampleProject.SecondPackage
+dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction
 ```
 
 ## Usage
 
-Usage description
+Mark all public properties with *TelemetryItemAttribute* so they will be extracted by *ObjectTelemetryItemsCollector*.
 
 ```csharp
-  TODO
+public class TestObject
+{
+	[TelemetryItem]
+	public int ToLogInt { get; set; }
+
+	[TelemetryItem]
+	public string? ToLogString { get; set; }
+
+	public int NotToLog { get; set; }
+}
+```
+
+In this example only **ToLogInt** and **ToLogString** properties will be extracted. **NotToLog** will not be extracted.
+
+# Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry/)
+
+This package is used for integration with OpenTelemetry.
+
+## Installing
+
+```shell
+dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry
+```
+
+## Usage
+
+### Static telemetry items in resource
+
+Static telemetry items can be added to OpenTelemetry resource information by *AddStaticTelemetryItems* extension method.
+
+```csharp
+builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
+{
+    tracerProviderBuilder
+        .SetResourceBuilder(ResourceBuilder
+            .CreateDefault()
+            .AddService(serviceName)
+            .AddStaticTelemetryItems())
+        .AddConsoleExporter();
+});
+```
+
+Static data are collected by *StaticTelemetryItemsCollector* class which is described above. All static data providers must be registered before OpenTelemetry.
+
+### Activity enrichment with tags
+
+You can use *ActivityTagEnricher* to enrich activity with tags from telemetry items. Here is an example:
+
+```csharp
+var telemetryItem = new TelemetryItem("method.type", "test");
+ActivityTagEnricher.Enrich(telemetryItem);
+```
+
+# Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog/)
+
+This package is used for integration with Serilog.
+
+## Installing
+
+```shell
+dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog
+```
+
+## Usage
+
+*LogPropertyDataAccessor* is used for collecting telemetry items that are available in async context.
+
+To enrich all logs with static telemetry items collected by *StaticTelemetryItemsCollector* (described above) use *WithPropertyDataAccessor* extension method.
+To enrich all logs with telemetry items collected by *LogPropertyDataAccessor* use *WithPropertyDataAccessor* extension method.
+
+```csharp
+builder.Host.UseSerilog((_, loggerConfiguration) =>
+{
+    loggerConfiguration
+        .Enrich.WithPropertyDataAccessor()
+        .Enrich.WithStaticTelemetryItems();
+    loggerConfiguration.WriteTo.Console(new JsonFormatter());
+});
+```
+
+Here is an example for sending telemetry items to *LogPropertyDataAccessor* in controller action method:
+
+```csharp
+LogPropertyDataAccessor.AddTelemetryItem("method.type", "test");
 ```
 
 # Contributing

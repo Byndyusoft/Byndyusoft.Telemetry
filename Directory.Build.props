@@ -8,7 +8,7 @@
     <AssemblyName>Byndyusoft.AspNetCore.Mvc.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Byndyusoft.AspNetCore.Mvc.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 
-    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionPrefix>0.0.2</VersionPrefix>
     <Authors>Byndyusoft</Authors>
 
     <PackageTags>Byndyusoft</PackageTags>

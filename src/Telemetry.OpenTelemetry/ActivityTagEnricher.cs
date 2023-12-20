@@ -12,7 +12,18 @@ namespace Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry
                 return;
 
             foreach (var telemetryItem in telemetryItems) 
-                activity.AddTag(telemetryItem.Name, telemetryItem.Value);
+                Enrich(activity, telemetryItem);
+        }
+
+        public static void Enrich(TelemetryItem telemetryItem)
+        {
+            var activity = Activity.Current;
+            Enrich(activity, telemetryItem);
+        }
+
+        public static void Enrich(Activity? activity, TelemetryItem telemetryItem)
+        {
+            activity?.AddTag(telemetryItem.Name, telemetryItem.Value);
         }
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Byndyusoft.AspNetCore.Mvc.Telemetry;
 using Byndyusoft.AspNetCore.Mvc.Telemetry.Logging;
+using Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -26,7 +28,10 @@ namespace Byndyusoft.AspNetCore.Mvc.TestApi.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
-            LogPropertyDataAccessor.AddTelemetryItem("method.type", "test");
+            var telemetryItem = new TelemetryItem("method.type", "test");
+            LogPropertyDataAccessor.AddTelemetryItem(telemetryItem);
+            ActivityTagEnricher.Enrich(telemetryItem);
+
             _logger.LogInformation("Get Weather");
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast

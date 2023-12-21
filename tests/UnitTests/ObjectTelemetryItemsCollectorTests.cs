@@ -9,20 +9,13 @@ namespace Byndyusoft.UnitTests
 {
     public class ObjectTelemetryItemsCollectorTests
     {
-        private readonly ObjectTelemetryItemsCollector _collector;
-
-        public ObjectTelemetryItemsCollectorTests()
-        {
-            _collector = new ObjectTelemetryItemsCollector();
-        }
-
         [Theory]
         [MemberData(nameof(GetTestCaseData))]
         public void Collect(string parameterName, object idValue, string namePrefix,
             TelemetryItem[] expectedTelemetryItems)
         {
             // Act
-            var telemetryItems = _collector.Collect(parameterName, idValue, namePrefix);
+            var telemetryItems = ObjectTelemetryItemsCollector.Collect(parameterName, idValue, namePrefix);
 
             // Assert
             telemetryItems.Should().BeEquivalentTo(expectedTelemetryItems);

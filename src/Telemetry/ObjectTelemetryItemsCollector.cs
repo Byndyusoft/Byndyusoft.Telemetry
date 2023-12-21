@@ -6,7 +6,7 @@ namespace Byndyusoft.Telemetry
 {
     public class ObjectTelemetryItemsCollector
     {
-        public TelemetryItem[] Collect(string parameterName, object? value, string namePrefix = "")
+        public static TelemetryItem[] Collect(string parameterName, object? value, string namePrefix = "")
         {
             if (value == null)
                 return Array.Empty<TelemetryItem>();
@@ -19,7 +19,7 @@ namespace Byndyusoft.Telemetry
             return propertyItems.Select(i => new TelemetryItem(namePrefix + i.PropertyName, i.Value)).ToArray();
         }
 
-        private bool IsNotObject(Type type)
+        private static bool IsNotObject(Type type)
         {
             var underlyingNullableType = Nullable.GetUnderlyingType(type);
             if (underlyingNullableType is not null)
@@ -28,7 +28,10 @@ namespace Byndyusoft.Telemetry
             return type.IsPrimitive || type == typeof(string);
         }
 
-        private TelemetryItem[] CollectNotObjectTelemetryValues(string parameterName, object? value, string namePrefix)
+        private static TelemetryItem[] CollectNotObjectTelemetryValues(
+            string parameterName,
+            object? value,
+            string namePrefix)
         {
             if (parameterName.EndsWith("id", StringComparison.InvariantCultureIgnoreCase))
                 return new[] { new TelemetryItem(namePrefix + parameterName, value) };

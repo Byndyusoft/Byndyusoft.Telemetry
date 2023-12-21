@@ -7,7 +7,11 @@ namespace Byndyusoft.Telemetry.OpenTelemetry
     {
         public static void Enrich(IEnumerable<TelemetryItem> telemetryItems)
         {
-            var activity = Activity.Current;
+            Enrich(Activity.Current, telemetryItems);
+        }
+
+        public static void Enrich(Activity? activity, IEnumerable<TelemetryItem> telemetryItems)
+        {
             if (activity is null)
                 return;
 

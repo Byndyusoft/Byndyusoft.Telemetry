@@ -17,13 +17,22 @@ namespace Byndyusoft.Telemetry.OpenTelemetry
 
         public static void Enrich(TelemetryItem telemetryItem)
         {
-            var activity = Activity.Current;
-            Enrich(activity, telemetryItem);
+            Enrich(Activity.Current, telemetryItem);
         }
 
         public static void Enrich(Activity? activity, TelemetryItem telemetryItem)
         {
             activity?.AddTag(telemetryItem.Name, telemetryItem.Value);
+        }
+
+        public static void Enrich(string name, object? value)
+        {
+            Enrich(Activity.Current, name, value);
+        }
+
+        public static void Enrich(Activity? activity, string name, object? value)
+        {
+            activity?.AddTag(name, value);
         }
     }
 }

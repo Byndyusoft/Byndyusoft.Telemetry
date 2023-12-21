@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Reflection
+﻿namespace Byndyusoft.Telemetry.Reflection
 {
     public class PropertyItem
     {

@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Byndyusoft.AspNetCore.Mvc.Telemetry;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog;
+using Byndyusoft.Telemetry;
+using Byndyusoft.Telemetry.OpenTelemetry;
+using Byndyusoft.Telemetry.Serilog;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Byndyusoft.AspNetCore.Mvc.TestApi.Controllers
+namespace Byndyusoft.TestApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

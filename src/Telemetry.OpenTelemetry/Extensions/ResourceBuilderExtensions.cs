@@ -1,4 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry;
+﻿using Byndyusoft.Telemetry.OpenTelemetry;
 
 // ReSharper disable once CheckNamespace
 namespace OpenTelemetry.Resources

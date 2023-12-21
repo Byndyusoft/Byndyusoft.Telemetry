@@ -1,7 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.Enrichers
+namespace Byndyusoft.Telemetry.Serilog.Enrichers
 {
     public class TelemetryPropertyDataAccessorEnricher : ILogEventEnricher
     {

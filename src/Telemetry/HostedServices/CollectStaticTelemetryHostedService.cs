@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
+using Byndyusoft.Telemetry.Providers.Interface;
 using Microsoft.Extensions.Hosting;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices
+namespace Byndyusoft.Telemetry.HostedServices
 {
     public class CollectStaticTelemetryHostedService : IHostedService
     {

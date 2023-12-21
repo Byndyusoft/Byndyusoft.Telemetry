@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Consts;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
+using Byndyusoft.Telemetry.Consts;
+using Byndyusoft.Telemetry.Providers.Interface;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
+namespace Byndyusoft.Telemetry.Providers
 {
     public class BuildConfigurationStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {

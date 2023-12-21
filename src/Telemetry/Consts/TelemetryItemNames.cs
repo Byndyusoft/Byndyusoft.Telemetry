@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Consts
+﻿namespace Byndyusoft.Telemetry.Consts
 {
     public static class TelemetryItemNames
     {

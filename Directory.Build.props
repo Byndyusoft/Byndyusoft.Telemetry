@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>9</LangVersion>
 
-    <AssemblyName>Byndyusoft.AspNetCore.Mvc.$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>Byndyusoft.AspNetCore.Mvc.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>Byndyusoft.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Byndyusoft.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 
     <VersionPrefix>0.0.2</VersionPrefix>
     <Authors>Byndyusoft</Authors>

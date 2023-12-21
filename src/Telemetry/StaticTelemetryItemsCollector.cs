@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
+using Byndyusoft.Telemetry.Providers.Interface;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry
+namespace Byndyusoft.Telemetry
 {
     public class StaticTelemetryItemsCollector
     {

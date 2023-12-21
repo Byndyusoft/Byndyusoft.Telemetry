@@ -1,7 +1,7 @@
 ﻿using System;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface;
+using Byndyusoft.Telemetry.Providers.Interface;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Base
+namespace Byndyusoft.Telemetry.Providers.Base
 {
     public class EnvironmentStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {

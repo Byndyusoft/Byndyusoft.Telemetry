@@ -1,7 +1,7 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Consts;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Base;
+﻿using Byndyusoft.Telemetry.Consts;
+using Byndyusoft.Telemetry.Providers.Base;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers
+namespace Byndyusoft.Telemetry.Providers
 {
     public class AspNetCoreEnvironmentStaticTelemetryItemProvider : EnvironmentStaticTelemetryItemProvider
     {

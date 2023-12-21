@@ -1,4 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.Enrichers;
+﻿using Byndyusoft.Telemetry.Serilog.Enrichers;
 
 // ReSharper disable once CheckNamespace
 namespace Serilog.Configuration

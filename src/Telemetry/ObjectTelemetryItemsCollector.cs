@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Reflection;
+using Byndyusoft.Telemetry.Reflection;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry
+namespace Byndyusoft.Telemetry
 {
     public class ObjectTelemetryItemsCollector
     {

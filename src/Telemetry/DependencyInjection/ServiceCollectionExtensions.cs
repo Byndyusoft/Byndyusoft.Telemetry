@@ -1,5 +1,5 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.HostedServices;
+﻿using Byndyusoft.Telemetry;
+using Byndyusoft.Telemetry.HostedServices;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection

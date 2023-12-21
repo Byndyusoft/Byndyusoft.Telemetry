@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Byndyusoft.AspNetCore.Mvc.Telemetry;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.Attributes;
+using Byndyusoft.Telemetry;
+using Byndyusoft.Telemetry.Abstraction.Attributes;
 using FluentAssertions;
 using Xunit;
 
-namespace Byndyusoft.AspNetCore.Mvc.UnitTests
+namespace Byndyusoft.UnitTests
 {
     public class ObjectTelemetryItemsCollectorTests
     {

@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Providers.Interface
+﻿namespace Byndyusoft.Telemetry.Providers.Interface
 {
     public interface IStaticTelemetryItemProvider
     {

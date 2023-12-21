@@ -2,9 +2,9 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
-using Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.Attributes;
+using Byndyusoft.Telemetry.Abstraction.Attributes;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.Reflection
+namespace Byndyusoft.Telemetry.Reflection
 {
     public class TypePropertyCache
     {

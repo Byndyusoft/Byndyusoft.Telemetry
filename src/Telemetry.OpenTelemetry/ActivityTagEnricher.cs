@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry
+namespace Byndyusoft.Telemetry.OpenTelemetry
 {
     public class ActivityTagEnricher
     {

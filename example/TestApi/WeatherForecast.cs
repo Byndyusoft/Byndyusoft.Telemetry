@@ -1,6 +1,6 @@
 using System;
 
-namespace Byndyusoft.AspNetCore.Mvc.TestApi
+namespace Byndyusoft.TestApi
 {
     public class WeatherForecast
     {

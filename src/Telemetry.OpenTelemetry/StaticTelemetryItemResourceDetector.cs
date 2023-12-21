@@ -2,7 +2,7 @@
 using System.Linq;
 using OpenTelemetry.Resources;
 
-namespace Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry
+namespace Byndyusoft.Telemetry.OpenTelemetry
 {
     public class StaticTelemetryItemResourceDetector : IResourceDetector
     {

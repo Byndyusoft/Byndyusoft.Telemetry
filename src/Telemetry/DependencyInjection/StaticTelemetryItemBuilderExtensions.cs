@@ -1,4 +1,4 @@
-﻿using Byndyusoft.AspNetCore.Mvc.Telemetry.Providers;
+﻿using Byndyusoft.Telemetry.Providers;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection

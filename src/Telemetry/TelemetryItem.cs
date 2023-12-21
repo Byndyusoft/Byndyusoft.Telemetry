@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.AspNetCore.Mvc.Telemetry
+﻿namespace Byndyusoft.Telemetry
 {
     public class TelemetryItem
     {

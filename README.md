@@ -1,6 +1,6 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-# Byndyusoft.AspNetCore.Mvc.Telemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry/)
+# Byndyusoft.Telemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry/)
 
 This package provides *TelemetryItem* type that is used for logging and tracing purposes. It has only two properties:
  - *Name* represents activity tag key or log object property name.
@@ -11,7 +11,7 @@ This package also provides static and object telemetry item collector.
 ## Installing
 
 ```shell
-dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry
+dotnet add package Byndyusoft.Telemetry
 ```
 
 ## Usage
@@ -48,14 +48,14 @@ This class should be used by different instrumentation tools such as:
 - RabbitMq consumers.
 - Kafka consumers.
 
-# Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction/)
+# Byndyusoft.Telemetry.Abstraction [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.Telemetry.Abstraction.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.Abstraction/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.Telemetry.Abstraction.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.Abstraction/)
 
 This class provides *TelemetryItemAttribute* attribute that is used by *ObjectTelemetryItemsCollector* described above.
 
 ## Installing
 
 ```shell
-dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry.Abstraction
+dotnet add package Byndyusoft.Telemetry.Abstraction
 ```
 
 ## Usage
@@ -77,14 +77,14 @@ public class TestObject
 
 In this example only **ToLogInt** and **ToLogString** properties will be extracted. **NotToLog** will not be extracted.
 
-# Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry/)
+# Byndyusoft.Telemetry.OpenTelemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.Telemetry.OpenTelemetry.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.OpenTelemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.Telemetry.OpenTelemetry.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.OpenTelemetry/)
 
 This package is used for integration with OpenTelemetry.
 
 ## Installing
 
 ```shell
-dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry.OpenTelemetry
+dotnet add package Byndyusoft.Telemetry.OpenTelemetry
 ```
 
 ## Usage
@@ -116,22 +116,39 @@ var telemetryItem = new TelemetryItem("method.type", "test");
 ActivityTagEnricher.Enrich(telemetryItem);
 ```
 
-# Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog.svg)](https://www.nuget.org/packages/Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog/)
+# Byndyusoft.Telemetry.Logging [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.Telemetry.Logging.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.Logging/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.Telemetry.Logging.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.Logging/)
+
+This package is used for integration with logging.
+
+## Installing
+
+```shell
+dotnet add package Byndyusoft.Telemetry.Logging
+```
+
+## Usage
+
+*LogPropertyDataAccessor* is used for collecting telemetry items that are available in async context.
+Here is an example for sending telemetry items to *LogPropertyDataAccessor* in controller action method:
+
+```csharp
+LogPropertyDataAccessor.AddTelemetryItem("method.type", "test");
+```
+
+# Byndyusoft.Telemetry.Logging.Serilog [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.Telemetry.Logging.Serilog.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.Logging.Serilog/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.Telemetry.Logging.Serilog.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry.Logging.Serilog/)
 
 This package is used for integration with Serilog.
 
 ## Installing
 
 ```shell
-dotnet add package Byndyusoft.AspNetCore.Mvc.Telemetry.Serilog
+dotnet add package Byndyusoft.Telemetry.Logging.Serilog
 ```
 
 ## Usage
 
-*LogPropertyDataAccessor* is used for collecting telemetry items that are available in async context.
-
 To enrich all logs with static telemetry items collected by *StaticTelemetryItemsCollector* (described above) use *WithPropertyDataAccessor* extension method.
-To enrich all logs with telemetry items collected by *LogPropertyDataAccessor* use *WithPropertyDataAccessor* extension method.
+To enrich all logs with telemetry items collected by *LogPropertyDataAccessor* (described above) use *WithPropertyDataAccessor* extension method.
 
 ```csharp
 builder.Host.UseSerilog((_, loggerConfiguration) =>
@@ -141,12 +158,6 @@ builder.Host.UseSerilog((_, loggerConfiguration) =>
         .Enrich.WithStaticTelemetryItems();
     loggerConfiguration.WriteTo.Console(new JsonFormatter());
 });
-```
-
-Here is an example for sending telemetry items to *LogPropertyDataAccessor* in controller action method:
-
-```csharp
-LogPropertyDataAccessor.AddTelemetryItem("method.type", "test");
 ```
 
 # Contributing

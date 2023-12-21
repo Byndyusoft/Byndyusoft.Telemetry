@@ -1,4 +1,5 @@
-﻿using Serilog.Core;
+﻿using Byndyusoft.Telemetry.Logging;
+using Serilog.Core;
 using Serilog.Events;
 
 namespace Byndyusoft.Telemetry.Serilog.Enrichers

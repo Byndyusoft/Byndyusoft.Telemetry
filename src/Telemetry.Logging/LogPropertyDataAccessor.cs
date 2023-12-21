@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Byndyusoft.Telemetry.Serilog
+namespace Byndyusoft.Telemetry.Logging
 {
     public class LogPropertyDataAccessor
     {

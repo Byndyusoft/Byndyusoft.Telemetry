@@ -34,7 +34,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telemetry.OpenTelemetry", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telemetry.Abstraction", "src\Telemetry.Abstraction\Telemetry.Abstraction.csproj", "{643A1FF7-102A-4156-ABCD-5029A7DB8811}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "tests\UnitTests\UnitTests.csproj", "{48DBD197-08D3-4326-BC38-1C2B7EAFDA09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "tests\UnitTests\UnitTests.csproj", "{48DBD197-08D3-4326-BC38-1C2B7EAFDA09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Telemetry.Logging", "src\Telemetry.Logging\Telemetry.Logging.csproj", "{7225EB80-C4D1-46AC-A244-509E66F14CCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{48DBD197-08D3-4326-BC38-1C2B7EAFDA09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48DBD197-08D3-4326-BC38-1C2B7EAFDA09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48DBD197-08D3-4326-BC38-1C2B7EAFDA09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7225EB80-C4D1-46AC-A244-509E66F14CCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7225EB80-C4D1-46AC-A244-509E66F14CCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7225EB80-C4D1-46AC-A244-509E66F14CCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7225EB80-C4D1-46AC-A244-509E66F14CCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,6 +85,7 @@ Global
 		{58DC52B3-8C0E-4E42-9A6C-7DDB8B57F898} = {F298540A-82E2-4421-9525-BBAC087AE77C}
 		{643A1FF7-102A-4156-ABCD-5029A7DB8811} = {F298540A-82E2-4421-9525-BBAC087AE77C}
 		{48DBD197-08D3-4326-BC38-1C2B7EAFDA09} = {CD2527C5-D6B4-4E6E-A878-FFE273B47511}
+		{7225EB80-C4D1-46AC-A244-509E66F14CCC} = {F298540A-82E2-4421-9525-BBAC087AE77C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5A3EF0C-96D2-472C-A367-AB34B065DC56}

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>
@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="3.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Telemetry.Logging\Telemetry.Logging.csproj" />
     <ProjectReference Include="..\Telemetry\Telemetry.csproj" />
   </ItemGroup>
 

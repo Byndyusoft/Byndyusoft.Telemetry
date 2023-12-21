@@ -13,7 +13,8 @@ namespace Byndyusoft.Telemetry.Logging.Serilog.Enrichers
 
         private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, TelemetryItem telemetryItem)
         {
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryItem.Name.Replace('.', '_'), telemetryItem.Value));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryItem.Name.Replace('.', '_'),
+                telemetryItem.Value));
         }
     }
 }

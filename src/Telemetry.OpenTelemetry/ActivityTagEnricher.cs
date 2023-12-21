@@ -11,7 +11,7 @@ namespace Byndyusoft.Telemetry.OpenTelemetry
             if (activity is null)
                 return;
 
-            foreach (var telemetryItem in telemetryItems) 
+            foreach (var telemetryItem in telemetryItems)
                 Enrich(activity, telemetryItem);
         }
 

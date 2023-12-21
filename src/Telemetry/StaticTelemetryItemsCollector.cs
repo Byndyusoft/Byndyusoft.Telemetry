@@ -12,7 +12,7 @@ namespace Byndyusoft.Telemetry
 
         internal static void CollectDataFrom(IStaticTelemetryItemProvider[] providers)
         {
-            foreach (var provider in providers) 
+            foreach (var provider in providers)
                 CollectDataFrom(provider);
         }
 

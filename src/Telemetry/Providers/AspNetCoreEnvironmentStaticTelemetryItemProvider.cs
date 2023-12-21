@@ -5,7 +5,7 @@ namespace Byndyusoft.Telemetry.Providers
 {
     public class AspNetCoreEnvironmentStaticTelemetryItemProvider : EnvironmentStaticTelemetryItemProvider
     {
-        public AspNetCoreEnvironmentStaticTelemetryItemProvider() 
+        public AspNetCoreEnvironmentStaticTelemetryItemProvider()
             : base("ASPNETCORE_ENVIRONMENT", TelemetryItemNames.Environment)
         {
         }

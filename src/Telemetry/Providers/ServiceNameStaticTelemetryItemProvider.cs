@@ -15,8 +15,6 @@ namespace Byndyusoft.Telemetry.Providers
                 : serviceName;
         }
 
-        private string GetAssemblyName() => Assembly.GetEntryAssembly()?.GetName().Name ?? "";
-
         public TelemetryItem[] GetTelemetryItems()
         {
             return new[]
@@ -24,5 +22,7 @@ namespace Byndyusoft.Telemetry.Providers
                 new TelemetryItem(TelemetryItemNames.ServiceName, _serviceName)
             };
         }
+
+        private string GetAssemblyName() => Assembly.GetEntryAssembly()?.GetName().Name ?? "";
     }
 }

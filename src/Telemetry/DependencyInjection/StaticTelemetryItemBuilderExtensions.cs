@@ -15,12 +15,14 @@ namespace Microsoft.Extensions.DependencyInjection
             return builder.WithProvider<AspNetCoreEnvironmentStaticTelemetryItemProvider>();
         }
 
-        public static StaticTelemetryItemBuilder WithServiceName(this StaticTelemetryItemBuilder builder, string? serviceName = null)
+        public static StaticTelemetryItemBuilder WithServiceName(this StaticTelemetryItemBuilder builder,
+            string? serviceName = null)
         {
             return builder.WithProvider(new ServiceNameStaticTelemetryItemProvider(serviceName));
         }
 
-        public static StaticTelemetryItemBuilder WithApplicationVersion(this StaticTelemetryItemBuilder builder, string version)
+        public static StaticTelemetryItemBuilder WithApplicationVersion(this StaticTelemetryItemBuilder builder,
+            string version)
         {
             return builder.WithProvider(new ApplicationVersionStaticTelemetryItemProvider(version));
         }

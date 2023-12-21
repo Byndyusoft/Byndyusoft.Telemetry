@@ -20,7 +20,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         public StaticTelemetryItemBuilder WithProvider<T>(T provider)
-        where T : IStaticTelemetryItemProvider
+            where T : IStaticTelemetryItemProvider
         {
             _services.AddSingleton<IStaticTelemetryItemProvider>(provider);
             return this;

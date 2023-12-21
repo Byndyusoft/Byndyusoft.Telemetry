@@ -18,7 +18,8 @@ namespace Byndyusoft.UnitTests
 
         [Theory]
         [MemberData(nameof(GetTestCaseData))]
-        public void Collect(string parameterName, object idValue, string namePrefix, TelemetryItem[] expectedTelemetryItems)
+        public void Collect(string parameterName, object idValue, string namePrefix,
+            TelemetryItem[] expectedTelemetryItems)
         {
             // Act
             var telemetryItems = _collector.Collect(parameterName, idValue, namePrefix);
@@ -38,12 +39,13 @@ namespace Byndyusoft.UnitTests
                 { "warehouse_id", 12, defaultNamePrefix, new[] { new TelemetryItem("param.warehouse_id", 12) } };
             yield return new object[]
                 { "stringId", "value", defaultNamePrefix, new[] { new TelemetryItem("param.stringId", "value") } };
-            
+
             yield return new object[] { "name", 10, defaultNamePrefix, Array.Empty<TelemetryItem>() };
             yield return new object[] { "id", DateTime.Now, defaultNamePrefix, Array.Empty<TelemetryItem>() };
 
             int? nullableInt = 11;
-            yield return new object[] { "id", nullableInt, defaultNamePrefix, new[] { new TelemetryItem("param.id", 11) } };
+            yield return new object[]
+                { "id", nullableInt, defaultNamePrefix, new[] { new TelemetryItem("param.id", 11) } };
 
             var testObject = new TestObject
             {
@@ -62,11 +64,9 @@ namespace Byndyusoft.UnitTests
 
         private class TestObject
         {
-            [TelemetryItem]
-            public int ToLogInt { get; set; }
+            [TelemetryItem] public int ToLogInt { get; set; }
 
-            [TelemetryItem]
-            public string? ToLogString { get; set; }
+            [TelemetryItem] public string? ToLogString { get; set; }
 
             public int NotToLog { get; set; }
         }

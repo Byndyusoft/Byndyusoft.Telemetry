@@ -1,7 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 
-namespace Byndyusoft.Telemetry.Serilog.Enrichers
+namespace Byndyusoft.Telemetry.Logging.Serilog.Enrichers
 {
     public class TelemetryStaticTelemetryItemsEnricher : ILogEventEnricher
     {

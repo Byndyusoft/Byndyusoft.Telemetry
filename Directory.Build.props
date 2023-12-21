@@ -8,7 +8,7 @@
     <AssemblyName>Byndyusoft.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>Byndyusoft.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 
-    <VersionPrefix>0.0.2</VersionPrefix>
+    <VersionPrefix>0.0.3</VersionPrefix>
     <Authors>Byndyusoft</Authors>
 
     <PackageTags>Byndyusoft</PackageTags>

@@ -16,7 +16,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 
-    <RepositoryUrl>https://github.com/Byndyusoft/Byndyusoft.AspNetCore.Mvc.Telemetry</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Byndyusoft/Byndyusoft.Telemetry</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
 
     <PackageIcon>icon.png</PackageIcon>

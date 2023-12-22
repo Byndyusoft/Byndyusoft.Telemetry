@@ -7,12 +7,12 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static StaticTelemetryItemBuilder WithBuildConfiguration(this StaticTelemetryItemBuilder builder)
         {
-            return builder.WithProvider<BuildConfigurationStaticTelemetryItemProvider>();
+            return builder.WithProvider(new BuildConfigurationStaticTelemetryItemProvider());
         }
 
         public static StaticTelemetryItemBuilder WithAspNetCoreEnvironment(this StaticTelemetryItemBuilder builder)
         {
-            return builder.WithProvider<AspNetCoreEnvironmentStaticTelemetryItemProvider>();
+            return builder.WithProvider(new AspNetCoreEnvironmentStaticTelemetryItemProvider());
         }
 
         public static StaticTelemetryItemBuilder WithServiceName(this StaticTelemetryItemBuilder builder,

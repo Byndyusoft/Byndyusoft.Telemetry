@@ -16,7 +16,7 @@ namespace Byndyusoft.Telemetry
                 CollectDataFrom(provider);
         }
 
-        private static void CollectDataFrom(IStaticTelemetryItemProvider provider)
+        internal static void CollectDataFrom(IStaticTelemetryItemProvider provider)
         {
             TelemetryItems.AddRange(provider.GetTelemetryItems());
         }

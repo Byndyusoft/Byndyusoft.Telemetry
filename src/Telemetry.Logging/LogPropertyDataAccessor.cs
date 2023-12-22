@@ -9,6 +9,11 @@ namespace Byndyusoft.Telemetry.Logging
     {
         private static readonly AsyncLocal<EventDataHolder> EventDataCurrent = new();
 
+        public static void InitAsyncContext()
+        {
+            EventDataCurrent.Value ??= new EventDataHolder();
+        }
+
         public static void AddTelemetryItem(string name, object? value)
         {
             AddTelemetryItem(new TelemetryItem(name, value));
@@ -16,13 +21,13 @@ namespace Byndyusoft.Telemetry.Logging
 
         public static void AddTelemetryItem(TelemetryItem telemetryItem)
         {
-            EventDataCurrent.Value ??= new EventDataHolder();
+            InitAsyncContext();
             EventDataCurrent.Value.EventData.Add(telemetryItem);
         }
 
         public static void AddTelemetryItems(TelemetryItem[] telemetryItems)
         {
-            EventDataCurrent.Value ??= new EventDataHolder();
+            InitAsyncContext();
             EventDataCurrent.Value.EventData.AddRange(telemetryItems);
         }
 

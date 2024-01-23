@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using Byndyusoft.Telemetry.Reflection;
-
-namespace Byndyusoft.Telemetry
+﻿namespace Byndyusoft.Telemetry
 {
+    using System;
+    using System.Linq;
+    using Reflection;
+
     public class ObjectTelemetryItemsCollector
     {
         public static TelemetryItem[] Collect(string parameterName, object? value, string namePrefix = "")

@@ -1,8 +1,10 @@
-﻿using Byndyusoft.Telemetry.Providers;
+﻿
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
+    using Byndyusoft.Telemetry.Providers;
+
     public static class StaticTelemetryItemBuilderExtensions
     {
         public static StaticTelemetryItemBuilder WithBuildConfiguration(this StaticTelemetryItemBuilder builder)
@@ -16,13 +18,13 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         public static StaticTelemetryItemBuilder WithServiceName(this StaticTelemetryItemBuilder builder,
-            string? serviceName = null)
+                                                                 string? serviceName = null)
         {
             return builder.WithProvider(new ServiceNameStaticTelemetryItemProvider(serviceName));
         }
 
         public static StaticTelemetryItemBuilder WithApplicationVersion(this StaticTelemetryItemBuilder builder,
-            string version)
+                                                                        string version)
         {
             return builder.WithProvider(new ApplicationVersionStaticTelemetryItemProvider(version));
         }

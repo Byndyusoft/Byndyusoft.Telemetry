@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
-using System.Reflection;
-using Byndyusoft.Telemetry.Abstraction.Attributes;
-
-namespace Byndyusoft.Telemetry.Reflection
+﻿namespace Byndyusoft.Telemetry.Reflection
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Linq;
+    using System.Reflection;
+    using Abstraction.Attributes;
+
     public class TypePropertyCache
     {
         private static readonly ConcurrentDictionary<Type, TypePropertyCache> Caches = new();
@@ -15,9 +15,9 @@ namespace Byndyusoft.Telemetry.Reflection
         {
             Type = type;
             _properties = type
-                .GetProperties()
-                .Where(i => i.GetCustomAttribute<TelemetryItemAttribute>() != null && i.GetMethod != null)
-                .ToArray();
+                          .GetProperties()
+                          .Where(i => i.GetCustomAttribute<TelemetryItemAttribute>() != null && i.GetMethod != null)
+                          .ToArray();
         }
 
         public Type Type { get; }
@@ -34,8 +34,8 @@ namespace Byndyusoft.Telemetry.Reflection
                 throw new ArgumentNullException(nameof(value));
 
             var propertyItems = _properties
-                .Select(i => new PropertyItem(i.Name, i.GetValue(value)))
-                .ToArray();
+                                .Select(i => new PropertyItem(i.Name, i.GetValue(value)))
+                                .ToArray();
 
             return propertyItems;
         }

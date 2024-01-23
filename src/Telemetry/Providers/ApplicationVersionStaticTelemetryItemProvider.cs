@@ -1,8 +1,8 @@
-﻿using Byndyusoft.Telemetry.Consts;
-using Byndyusoft.Telemetry.Providers.Interface;
-
-namespace Byndyusoft.Telemetry.Providers
+﻿namespace Byndyusoft.Telemetry.Providers
 {
+    using Consts;
+    using Interface;
+
     public class ApplicationVersionStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {
         private readonly string _version;
@@ -15,9 +15,9 @@ namespace Byndyusoft.Telemetry.Providers
         public TelemetryItem[] GetTelemetryItems()
         {
             return new[]
-            {
-                new TelemetryItem(TelemetryItemNames.Version, _version)
-            };
+                       {
+                           new TelemetryItem(TelemetryItemNames.Version, _version)
+                       };
         }
     }
 }

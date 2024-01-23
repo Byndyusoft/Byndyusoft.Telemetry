@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Byndyusoft.Telemetry.Providers.Interface;
-
-namespace Byndyusoft.Telemetry
+﻿namespace Byndyusoft.Telemetry
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Providers.Interface;
+
     public class StaticTelemetryItemsCollector
     {
         private static readonly List<TelemetryItem> TelemetryItems = new();

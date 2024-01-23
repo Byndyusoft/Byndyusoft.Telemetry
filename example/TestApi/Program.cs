@@ -16,12 +16,12 @@ var builder = WebApplication
     .CreateBuilder(args);
 
 builder.Host.UseSerilog((_, loggerConfiguration) =>
-{
-    loggerConfiguration
-        .Enrich.WithPropertyDataAccessor()
-        .Enrich.WithStaticTelemetryItems();
-    loggerConfiguration.WriteTo.Console(new JsonFormatter());
-});
+                            {
+                                loggerConfiguration
+                                    .Enrich.WithPropertyDataAccessor()
+                                    .Enrich.WithStaticTelemetryItems();
+                                loggerConfiguration.WriteTo.Console(new JsonFormatter());
+                            });
 
 // Add services to the container.
 
@@ -33,26 +33,26 @@ builder.Services.AddSwaggerGen();
 
 var serviceName = builder.Configuration.GetValue<string>("Jaeger:ServiceName");
 
-builder.Services.AddOpenTelemetry().WithTracing(tracerProviderBuilder =>
-{
-    tracerProviderBuilder
-        .SetResourceBuilder(ResourceBuilder
-            .CreateDefault()
-            .AddService(serviceName)
-            .AddStaticTelemetryItems())
-        .AddAspNetCoreInstrumentation(options =>
-        {
-            options.Filter = context => context.Request.Path.StartsWithSegments("/swagger") == false;
-        })
-        .AddConsoleExporter()
-        .AddOtlpExporter(builder.Configuration.GetSection("Jaeger").Bind);
-});
+builder.Services
+       .AddOpenTelemetry()
+       .WithTracing(
+                    tracerProviderBuilder =>
+                        {
+                            tracerProviderBuilder
+                                .SetResourceBuilder(ResourceBuilder
+                                                    .CreateDefault()
+                                                    .AddService(serviceName)
+                                                    .AddStaticTelemetryItems())
+                                .AddAspNetCoreInstrumentation(options => { options.Filter = context => context.Request.Path.StartsWithSegments("/swagger") == false; })
+                                .AddConsoleExporter()
+                                .AddOtlpExporter(builder.Configuration.GetSection("Jaeger").Bind);
+                        });
 
 builder.Services.ConfigureStaticTelemetryItemCollector()
-    .WithBuildConfiguration()
-    .WithAspNetCoreEnvironment()
-    .WithServiceName(serviceName)
-    .WithApplicationVersion("0.0.0.1");
+       .WithBuildConfiguration()
+       .WithAspNetCoreEnvironment()
+       .WithServiceName(serviceName)
+       .WithApplicationVersion("0.0.0.1");
 
 var app = builder.Build();
 

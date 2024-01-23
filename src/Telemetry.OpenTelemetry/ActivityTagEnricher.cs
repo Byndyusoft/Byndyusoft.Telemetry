@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-
-namespace Byndyusoft.Telemetry.OpenTelemetry
+﻿namespace Byndyusoft.Telemetry.OpenTelemetry
 {
+    using System.Collections.Generic;
+    using System.Diagnostics;
+
     public class ActivityTagEnricher
     {
         public static void Enrich(IEnumerable<TelemetryItem> telemetryItems)

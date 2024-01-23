@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Byndyusoft.Telemetry.Consts;
-using Byndyusoft.Telemetry.Providers.Interface;
-
-namespace Byndyusoft.Telemetry.Providers
+﻿namespace Byndyusoft.Telemetry.Providers
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using Consts;
+    using Interface;
+
     public class BuildConfigurationStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {
         public TelemetryItem[] GetTelemetryItems()

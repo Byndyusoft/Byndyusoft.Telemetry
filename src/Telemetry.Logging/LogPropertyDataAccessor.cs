@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-
-namespace Byndyusoft.Telemetry.Logging
+﻿namespace Byndyusoft.Telemetry.Logging
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+
     public class LogPropertyDataAccessor
     {
         private static readonly AsyncLocal<EventDataHolder> EventDataCurrent = new();

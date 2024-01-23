@@ -1,8 +1,10 @@
-﻿using Byndyusoft.Telemetry.Logging.Serilog.Enrichers;
+﻿
 
 // ReSharper disable once CheckNamespace
 namespace Serilog.Configuration
 {
+    using Byndyusoft.Telemetry.Logging.Serilog.Enrichers;
+
     public static class LoggerEnrichmentConfigurationExtensions
     {
         public static LoggerConfiguration WithPropertyDataAccessor(

@@ -1,8 +1,8 @@
-﻿using System;
-using Byndyusoft.Telemetry.Providers.Interface;
-
-namespace Byndyusoft.Telemetry.Providers.Base
+﻿namespace Byndyusoft.Telemetry.Providers.Base
 {
+    using System;
+    using Interface;
+
     public class EnvironmentStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {
         private readonly string _environmentName;
@@ -17,9 +17,9 @@ namespace Byndyusoft.Telemetry.Providers.Base
         public TelemetryItem[] GetTelemetryItems()
         {
             return new[]
-            {
-                new TelemetryItem(_telemetryItemName, Environment.GetEnvironmentVariable(_environmentName))
-            };
+                       {
+                           new TelemetryItem(_telemetryItemName, Environment.GetEnvironmentVariable(_environmentName))
+                       };
         }
     }
 }

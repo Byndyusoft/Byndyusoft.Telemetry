@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.Telemetry.Providers.Interface
+﻿namespace Byndyusoft.Telemetry.Abstraction.Interfaces
 {
     public interface IStaticTelemetryItemProvider
     {

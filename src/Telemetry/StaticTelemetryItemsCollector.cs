@@ -2,7 +2,8 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Providers.Interface;
+    using Abstraction;
+    using Abstraction.Interfaces;
 
     public class StaticTelemetryItemsCollector
     {

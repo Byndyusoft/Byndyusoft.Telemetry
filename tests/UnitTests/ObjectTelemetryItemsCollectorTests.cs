@@ -4,6 +4,7 @@ namespace Byndyusoft.UnitTests
     using System.Collections.Generic;
     using FluentAssertions;
     using Telemetry;
+    using Telemetry.Abstraction;
     using Telemetry.Abstraction.Attributes;
     using Xunit;
 

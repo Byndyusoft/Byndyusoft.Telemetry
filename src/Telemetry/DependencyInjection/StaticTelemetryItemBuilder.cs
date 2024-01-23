@@ -4,7 +4,7 @@
 namespace Microsoft.Extensions.DependencyInjection
 {
     using Byndyusoft.Telemetry;
-    using Byndyusoft.Telemetry.Providers.Interface;
+    using Byndyusoft.Telemetry.Abstraction.Interfaces;
 
     public class StaticTelemetryItemBuilder
     {

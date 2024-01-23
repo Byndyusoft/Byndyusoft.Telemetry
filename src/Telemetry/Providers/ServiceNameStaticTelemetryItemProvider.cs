@@ -1,8 +1,9 @@
 ﻿namespace Byndyusoft.Telemetry.Providers
 {
     using System.Reflection;
+    using Abstraction;
+    using Abstraction.Interfaces;
     using Consts;
-    using Interface;
 
     public class ServiceNameStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {

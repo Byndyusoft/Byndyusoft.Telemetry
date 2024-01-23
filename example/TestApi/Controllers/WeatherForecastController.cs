@@ -5,7 +5,7 @@ namespace Byndyusoft.TestApi.Controllers
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Telemetry;
+    using Telemetry.Abstraction;
     using Telemetry.Logging;
     using Telemetry.OpenTelemetry;
 

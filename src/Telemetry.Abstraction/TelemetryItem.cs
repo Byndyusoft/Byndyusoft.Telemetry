@@ -1,4 +1,4 @@
-﻿namespace Byndyusoft.Telemetry
+﻿namespace Byndyusoft.Telemetry.Abstraction
 {
     public class TelemetryItem
     {

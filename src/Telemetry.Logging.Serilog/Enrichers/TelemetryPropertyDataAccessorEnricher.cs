@@ -1,5 +1,6 @@
 ﻿namespace Byndyusoft.Telemetry.Logging.Serilog.Enrichers
 {
+    using Abstraction;
     using global::Serilog.Core;
     using global::Serilog.Events;
 

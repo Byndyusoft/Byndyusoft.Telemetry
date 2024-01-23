@@ -3,8 +3,9 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using Abstraction;
+    using Abstraction.Interfaces;
     using Consts;
-    using Interface;
 
     public class BuildConfigurationStaticTelemetryItemProvider : IStaticTelemetryItemProvider
     {

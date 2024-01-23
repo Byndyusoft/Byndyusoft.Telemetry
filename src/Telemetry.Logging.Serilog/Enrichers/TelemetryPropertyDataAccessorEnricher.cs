@@ -1,6 +1,7 @@
 ﻿namespace Byndyusoft.Telemetry.Logging.Serilog.Enrichers
 {
     using Abstraction;
+    using Extensions;
     using global::Serilog.Core;
     using global::Serilog.Events;
 
@@ -14,7 +15,7 @@
 
         private void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory, TelemetryItem telemetryItem)
         {
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryItem.Name.Replace('.', '_'),
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(telemetryItem.GetLogEventPropertyName(),
                                                                         telemetryItem.Value));
         }
     }

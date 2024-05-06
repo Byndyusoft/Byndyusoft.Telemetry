@@ -1,5 +1,15 @@
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+Telemetry data helps you analyze your software’s performance and behavior. This data must be generated, collected and exported. For this, three types of data channels are used: logs, metrics and traces.
+
+Sometimes we need to send same data to both logs and traces, and we need to take into account the characteristics of each channel. For example:
+
+1. We should add our service version and its environment information to each trace span and each log entry. This is necessary to identify the telemetry source, i.e. to identify which service sent this data and where it is located.
+2. We should add query resource identification attributes to each log entry for every REST API query. The same data must be added in trace span tags. This is necessary to find all the telemetry data quickly associated with the specific resource while supporting your software.
+3. We should add RabbitMQ message identification attributes to each log entry while processing it. The same data must be added in trace span tags. This is necessary to find all the telemetry data quickly associated with the specific resource while supporting your software.
+
+You can use the packages provided in this repository to simplify the process of collecting and sending data to logs and traces.
+
 # Byndyusoft.Telemetry [![Nuget](https://img.shields.io/nuget/v/Byndyusoft.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry/)[![Downloads](https://img.shields.io/nuget/dt/Byndyusoft.Telemetry.svg)](https://www.nuget.org/packages/Byndyusoft.Telemetry/)
 
 This package provides *TelemetryItem* type that is used for logging and tracing purposes. It has only two properties:
